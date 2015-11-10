@@ -63,3 +63,11 @@ ciri_df$count %>%
   ggplot(aes(x=., y=Freq)) +
   geom_bar(stat='identity')
 
+
+ciri_rbind %>%
+  select(circRNA_ID,sample,junction_reads_ratio) %>%
+  spread(sample, junction_reads_ratio) ->
+  ciri_ratio
+ciri_ratio$sd<-apply(100*ciri_ratio[,2:11], 1 , sd, na.rm=T)
+
+ciri_rbind_count_ratio_sd<-merge(ciri_rbind_count, ciri_ratio[,c('circRNA_ID','sd')])
