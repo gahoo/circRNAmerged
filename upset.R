@@ -71,3 +71,4 @@ ciri_rbind %>%
 ciri_ratio$sd<-apply(100*ciri_ratio[,2:11], 1 , sd, na.rm=T)
 
 ciri_rbind_count_ratio_sd<-merge(ciri_rbind_count, ciri_ratio[,c('circRNA_ID','sd')])
+write.table(ciri_rbind_count_ratio_sd, file='ciri_rbind.txt', row.names=F, quote=F, sep='\t')
