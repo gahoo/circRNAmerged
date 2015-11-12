@@ -54,6 +54,11 @@ upset(ciri_df, nsets=10,
       decreasing=c(T,F)
       )
 
+ciri_df_t<-ciri_df
+row.names(ciri_df_t)<-ciri_df$circRNA_ID
+ciri_df_t<-as.data.frame(t(ciri_df_t[,-1]))
+upset(ciri_df_t, sets = colnames(ciri_df_t)[1:5])
+
 
 ciri_df$count<-rowSums(ciri_df[,2:11])
 
@@ -72,3 +77,4 @@ ciri_ratio$sd<-apply(100*ciri_ratio[,2:11], 1 , sd, na.rm=T)
 
 ciri_rbind_count_ratio_sd<-merge(ciri_rbind_count, ciri_ratio[,c('circRNA_ID','sd')])
 write.table(ciri_rbind_count_ratio_sd, file='ciri_rbind.txt', row.names=F, quote=F, sep='\t')
+
