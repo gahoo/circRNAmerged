@@ -70,7 +70,7 @@ ciri_df$count %>%
   data.frame %>%
   ggplot(aes(x=., y=Freq)) +
   geom_bar(stat='identity') +
-  xlab('appear times')
+  xlab('occurrence count')
 
 
 ciri_rbind %>%
@@ -104,3 +104,15 @@ ciri_rbind_count %>%
 
 write.table(ciri_rbind_count_sd, file='ciri_rbind_sd.txt', row.names=F, quote=F, sep='\t')
 
+ciri_rbind_count_sd %>%
+  filter(symbol=='ABL2', count>4, circRNA_ID != 'chr1:179087722|179091002') %>%
+  select(ratio.Normal, ratio.Tumor, sample, circRNA_ID, p.values) %>%
+  gather(type,ratio,ratio.Normal,ratio.Tumor) %>%
+  mutate(type=gsub('ratio.','',type),
+         logP=-log10(p.values)) %>%
+  ggplot(aes(x=sample, y=ratio, group=type, color=type)) + 
+  geom_line() +
+  geom_point(aes(size=logP))+
+  facet_grid(circRNA_ID~.) +
+  ggtitle('ABL2') +
+  theme(axis.text.x=element_text(angle=90))
