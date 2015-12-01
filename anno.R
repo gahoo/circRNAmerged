@@ -49,7 +49,28 @@ ciri_rbind %>%
   left_join(anno) ->
   ciri_rbind_anno
 
+abs_diff<-function(x){sqrt(sum(x^2))}
+
 write.table(ciri_rbind_anno, file='ciri_rbind_region_check.txt', row.names=F, quote=F, sep='\t')
+
+ciri_rbind_anno %>%
+  dplyr::select(circRNA_ID, ratio.Normal, ratio.Tumor) %>%
+  mutate(ratio.Normal = 100 * ratio.Normal,
+         ratio.Tumor = 100 * ratio.Tumor,
+         ratio.diff = ratio.Tumor - ratio.Normal) %>%
+  group_by(circRNA_ID) %>%
+  summarise(occurrence = n(),
+            ratio.Normal.sd = sd(ratio.Normal),
+            ratio.Tumor.sd = sd(ratio.Tumor),
+            ratio.Diff.sd = sd(ratio.diff),
+            ratio.abs_diff = abs_diff(ratio.diff),
+            ratio.rank = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd * ratio.Diff.sd),
+            ratio.rank2 = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd),
+            ratio.rank3 = ratio.abs_diff/ratio.Diff.sd
+  ) ->
+  ciri_rbind_anno_rank
+
+write.table(ciri_rbind_anno_rank, file='ciri_rbind_rank.txt', row.names=F, quote=F, sep='\t')
 
 countSample<-function(df){
   df %>%
