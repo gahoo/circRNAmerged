@@ -60,12 +60,12 @@ ciri_rbind_anno %>%
          ratio.diff = ratio.Tumor - ratio.Normal) %>%
   group_by(circRNA_ID) %>%
   summarise(occurrence = n(),
-            ratio.Normal.sd = sd(ratio.Normal),
-            ratio.Tumor.sd = sd(ratio.Tumor),
-            ratio.Diff.sd = sd(ratio.diff),
-            ratio.Normal.sd = ifelse(is.na(ratio.Normal.sd),1,ratio.Normal.sd),
-            ratio.Tumor.sd = ifelse(is.na(ratio.Tumor.sd),1,ratio.Tumor.sd),
-            ratio.Diff.sd = ifelse(is.na(ratio.Diff.sd),1,ratio.Diff.sd),
+            ratio.Normal.sd = sd(ratio.Normal, na.rm=T),
+            ratio.Tumor.sd = sd(ratio.Tumor, na.rm=T),
+            ratio.Diff.sd = sd(ratio.diff, na.rm=T),
+            #ratio.Normal.sd = ifelse(is.na(ratio.Normal.sd),1,ratio.Normal.sd),
+            #ratio.Tumor.sd = ifelse(is.na(ratio.Tumor.sd),1,ratio.Tumor.sd),
+            #ratio.Diff.sd = ifelse(is.na(ratio.Diff.sd),1,ratio.Diff.sd),
             ratio.abs_diff = abs_diff(ratio.diff),
             ratio.rank = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd * ratio.Diff.sd),
             ratio.rank2 = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd),
