@@ -49,7 +49,7 @@ ciri_rbind %>%
   left_join(anno) ->
   ciri_rbind_anno
 
-abs_diff<-function(x){sqrt(sum(x^2))}
+abs_diff<-function(x){sqrt(sum(x^2)/length(x))}
 
 write.table(ciri_rbind_anno, file='ciri_rbind_region_check.txt', row.names=F, quote=F, sep='\t')
 
@@ -63,6 +63,9 @@ ciri_rbind_anno %>%
             ratio.Normal.sd = sd(ratio.Normal),
             ratio.Tumor.sd = sd(ratio.Tumor),
             ratio.Diff.sd = sd(ratio.diff),
+            ratio.Normal.sd = ifelse(is.na(ratio.Normal.sd),1,ratio.Normal.sd),
+            ratio.Tumor.sd = ifelse(is.na(ratio.Tumor.sd),1,ratio.Tumor.sd),
+            ratio.Diff.sd = ifelse(is.na(ratio.Diff.sd),1,ratio.Diff.sd),
             ratio.abs_diff = abs_diff(ratio.diff),
             ratio.rank = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd * ratio.Diff.sd),
             ratio.rank2 = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd),
@@ -184,15 +187,18 @@ plotRelExpPattern<-function(df, circRNA_IDs){
     dplyr::select(ratio.Normal, ratio.Tumor, sample, circRNA_ID, p.values, symbol, region_symbol) %>%
     gather(type,ratio,ratio.Normal,ratio.Tumor) %>%
     mutate(type=gsub('ratio.','',type),
-           log10P=-log10(p.values),
+           significant=p.values<=0.05,
+           log10P=log10(p.values),
            anno = sprintf("%s\n%s", 
                           ifelse(is.na(symbol), region_symbol, as.character(symbol)),
                           circRNA_ID)
            ) %>%
     ggplot(aes(x=sample, y=ratio, group=type, color=type)) + 
     geom_line() +
-    geom_point(aes(size=log10P))+
+    geom_point(aes(size=-log10P, alpha=significant)) +
+    #scale_size_continuous(range=c(2,8)) +
     facet_grid(anno~.) +
+    ylab('Relative Expression Ratio') +
     theme(axis.text.x=element_text(angle=90))
 }
 
