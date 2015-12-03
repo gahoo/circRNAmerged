@@ -141,7 +141,7 @@ plotTrack<-function(df, symbol, reads_cnt=0){
   tracks(track_list, title=symbol, heights = c(3,1))
 }
 
-df2granges<-function(df){
+df2GRanges<-function(df){
   df %>%
     select(chr, circRNA_start, circRNA_end, circRNA_ID) %>%
     filter(!is.na(chr)) %>%
