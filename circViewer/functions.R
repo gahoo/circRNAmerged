@@ -1,4 +1,5 @@
 library(UpSetR)
+library(GenomicRanges)
 library(dplyr)
 
 loadCIRI<-function(ciri_files){
@@ -138,4 +139,15 @@ plotTrack<-function(df, symbol, reads_cnt=0){
   
   track_list<-track_list[!sapply(track_list, is.null)]
   tracks(track_list, title=symbol, heights = c(3,1))
+}
+
+df2granges<-function(df){
+  df %>%
+    select(chr, circRNA_start, circRNA_end, circRNA_ID) %>%
+    filter(!is.na(chr)) %>%
+    unique %>%
+    makeGRangesFromDataFrame(seqnames.field='chr',
+                             start.field='circRNA_start',
+                             end.field='circRNA_end',
+                             keep.extra.columns=T)
 }
