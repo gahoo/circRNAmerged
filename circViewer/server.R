@@ -7,6 +7,7 @@ library(org.Hs.eg.db)
 library(dplyr)
 
 source('functions.R')
+GeneRanges<-loadGeneRanges()
 
 shinyServer(function(input, output, session) {
   output$ciri_files<-DT::renderDataTable({
@@ -22,7 +23,15 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_rbind<-reactive({
-    do.call(rbind, ciri_list())
+    df<-do.call(rbind, ciri_list())
+    df %>%
+      left_join(annotateDf(df2GRanges(df), GeneRanges)) %>%
+      left_join(rankCircRNA(df))
+  })
+  
+  output$ciri_table<-DT::renderDataTable({
+    ciri_rbind() %>%
+      datatable
   })
   
   output$helper<-renderText({
