@@ -3,12 +3,12 @@ library(GenomicRanges)
 library(org.Hs.eg.db)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 
-GeneID_SYMBOL<-select(org.Hs.eg.db, 
+GeneID_SYMBOL<-AnnotationDbi::select(org.Hs.eg.db, 
                       keys = keys(org.Hs.eg.db),
                       columns = c("ENTREZID", "SYMBOL")) %>%
   rename_(GENEID="ENTREZID")
 
-select(TxDb.Hsapiens.UCSC.hg19.knownGene,
+AnnotationDbi::select(TxDb.Hsapiens.UCSC.hg19.knownGene,
        keys = keys(TxDb.Hsapiens.UCSC.hg19.knownGene, keytype='GENEID'),
        columns = c('GENEID', 'TXID', 'TXCHROM', 'TXSTRAND', 'TXSTART', 'TXEND'),
        keytype = 'GENEID') %>%
