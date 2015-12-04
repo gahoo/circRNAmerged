@@ -21,11 +21,16 @@ collapsibleDiv<-function(id, ..., label='Show/Hide', .func=actionButton,
 shinyUI(fluidPage(
   titlePanel("circRNA BAM Viewer"),
   textOutput('helper'),
-  collapsibleDiv(id='info', collapse = T,
+  collapsibleDiv(id='settings', collapse = T,
                  label = 'Settings',
                  class = 'btn-info btn-xs',
                  icon = icon('info-sign',lib='glyphicon'),
                  textInput('ciri_path', 'CIRI ouput path', value = '../CIRI'),
                  DT::dataTableOutput('ciri_files')
+  ),
+  collapsibleDiv(id='ciri_table', collapse = F,
+                 label = 'CIRI',
+                 class = 'btn-info btn-xs',
+                 DT::dataTableOutput('ciri_table')
   )
 ))
