@@ -186,8 +186,25 @@ annotateDf<-function(dfRanges, GeneRanges){
     group_by(circRNA_ID) %>%
     summarise(region_gene_id=paste0(GENEID, collapse = ','),
               region_symbol=paste0(SYMBOL, collapse = ','),
-              region_gene_cnt=n())
+              region_gene_cnt=n()
+              #region_repaet=paste0(name, collapse = ',')
+              )
   
+}
+
+extend<-function(gr, width, start=T, end=T){
+  if(start){
+    start(gr)<-start(gr)-width
+  }
+  if(end){
+    end(gr)<-end(gr)+width
+  }
+  gr
+}
+
+flank_both<-function(gr, width){
+  c(flank(gr, start=T, width),
+    flank(gr, start=F, width))
 }
 
 rankCircRNA<-function(df) {
