@@ -36,13 +36,19 @@ shinyServer(function(input, output, session) {
     annotateDf(ciri_rbind_gr(), GeneRanges)
   })
   
+  ciri_rbind_rmsk<-reactive({
+    annotateDf(extend(ciri_rbind_gr(), 2000), rmsk)
+    #annotateDf(ciri_rbind_gr(), rmsk)
+  })
+  
   ciri_rbind_rank<-reactive({
     ciri_rbind() %>% rankCircRNA
   })
   
   output$ciri_table<-DT::renderDataTable({
     ciri_rbind() %>%
-      left_join(ciri_rbind_anno()) %>%
+      #left_join(ciri_rbind_anno()) %>%
+      left_join(ciri_rbind_rmsk()) %>%
       left_join(ciri_rbind_rank()) %>%
       datatable
   })
