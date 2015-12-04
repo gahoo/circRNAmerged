@@ -5,7 +5,7 @@ library(dplyr)
 loadCIRI<-function(ciri_files){
   lapply(ciri_files, function(ciri_file){
     read.table(ciri_file, sep='\t',header=T,
-               nrow=1000
+               nrow=100
                ) %>%
       mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
       data
@@ -150,4 +150,59 @@ df2GRanges<-function(df){
                              start.field='circRNA_start',
                              end.field='circRNA_end',
                              keep.extra.columns=T)
+}
+
+loadGeneRanges<-function(){
+  GeneID_SYMBOL<-AnnotationDbi::select(org.Hs.eg.db, 
+                                       keys = keys(org.Hs.eg.db),
+                                       columns = c("ENTREZID", "SYMBOL")) %>%
+    rename_(GENEID="ENTREZID")
+  
+  AnnotationDbi::select(TxDb.Hsapiens.UCSC.hg19.knownGene,
+                        keys = keys(TxDb.Hsapiens.UCSC.hg19.knownGene, keytype='GENEID'),
+                        columns = c('GENEID', 'TXID', 'TXCHROM', 'TXSTRAND', 'TXSTART', 'TXEND'),
+                        keytype = 'GENEID') %>%
+    group_by(GENEID, TXCHROM, TXSTRAND) %>%
+    summarise(start=min(TXSTART),
+              end = max(TXEND))%>%
+    merge(GeneID_SYMBOL, by='GENEID', all.x=T) %>%
+    makeGRangesFromDataFrame(seqnames.field="TXCHROM",
+                             strand.field="TXSTRAND",
+                             keep.extra.columns=T)
+}
+
+annotateDf<-function(dfRanges, GeneRanges){
+  hits<-findOverlaps(dfRanges, GeneRanges)
+  cbind(mcols(dfRanges[queryHits(hits)]),
+        mcols(GeneRanges[subjectHits(hits)])) %>%
+    unique %>%
+    as.data.frame %>%
+    group_by(circRNA_ID) %>%
+    summarise(region_gene_id=paste0(GENEID, collapse = ','),
+              region_symbol=paste0(SYMBOL, collapse = ','),
+              region_gene_cnt=n())
+  
+}
+
+rankCircRNA<-function(df) {
+  abs_diff<-function(x){sqrt(sum(x^2)/length(x))}
+  
+  df %>%
+    select(circRNA_ID, ratio.Normal, ratio.Tumor) %>%
+    mutate(ratio.Normal = 100 * ratio.Normal,
+           ratio.Tumor = 100 * ratio.Tumor,
+           ratio.diff = ratio.Tumor - ratio.Normal) %>%
+    group_by(circRNA_ID) %>%
+    summarise(occurrence = n(),
+              ratio.Normal.sd = sd(ratio.Normal, na.rm=T),
+              ratio.Tumor.sd = sd(ratio.Tumor, na.rm=T),
+              ratio.Diff.sd = sd(ratio.diff, na.rm=T),
+              #ratio.Normal.sd = ifelse(is.na(ratio.Normal.sd),1,ratio.Normal.sd),
+              #ratio.Tumor.sd = ifelse(is.na(ratio.Tumor.sd),1,ratio.Tumor.sd),
+              #ratio.Diff.sd = ifelse(is.na(ratio.Diff.sd),1,ratio.Diff.sd),
+              ratio.abs_diff = abs_diff(ratio.diff),
+              ratio.rank = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd * ratio.Diff.sd),
+              ratio.rank2 = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd),
+              ratio.rank3 = ratio.abs_diff/ratio.Diff.sd
+    )
 }
