@@ -8,6 +8,7 @@ library(dplyr)
 
 source('functions.R')
 GeneRanges<-loadGeneRanges()
+load('rmsk_0.0.1.RData')
 
 shinyServer(function(input, output, session) {
   output$ciri_files<-DT::renderDataTable({
@@ -23,18 +24,30 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_rbind<-reactive({
-    df<-do.call(rbind, ciri_list())
-    df %>%
-      left_join(annotateDf(df2GRanges(df), GeneRanges)) %>%
-      left_join(rankCircRNA(df))
+    df<-do.call(rbind, ciri_list()) %>%
+      mutate(length = circRNA_end - circRNA_start)
+  })
+  
+  ciri_rbind_gr<-reactive({
+    ciri_rbind() %>% df2GRanges
+  })
+  
+  ciri_rbind_anno<-reactive({
+    annotateDf(ciri_rbind_gr(), GeneRanges)
+  })
+  
+  ciri_rbind_rank<-reactive({
+    ciri_rbind() %>% rankCircRNA
   })
   
   output$ciri_table<-DT::renderDataTable({
     ciri_rbind() %>%
+      left_join(ciri_rbind_anno()) %>%
+      left_join(ciri_rbind_rank()) %>%
       datatable
   })
   
   output$helper<-renderText({
-    names(ciri_rbind())
+    #names(ciri_rbind())
   })
 })
