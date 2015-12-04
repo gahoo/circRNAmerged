@@ -37,7 +37,7 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_rbind_rmsk<-reactive({
-    annotateDf(extend(ciri_rbind_gr(), 2000), rmsk)
+    annotateDf(extend(ciri_rbind_gr(), input$extend_size), rmsk)
     #annotateDf(ciri_rbind_gr(), rmsk)
   })
   
