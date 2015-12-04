@@ -26,6 +26,8 @@ shinyUI(fluidPage(
                  class = 'btn-info btn-xs',
                  icon = icon('info-sign',lib='glyphicon'),
                  textInput('ciri_path', 'CIRI ouput path', value = '../CIRI'),
+                 numericInput('extend_size', 'extend size for repeat annotation:',
+                              value = '2000', min = 0, max = 100000),
                  DT::dataTableOutput('ciri_files')
   ),
   collapsibleDiv(id='ciri_table', collapse = F,
