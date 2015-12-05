@@ -82,29 +82,23 @@ shinyServer(function(input, output, session) {
   
   ciri_selected<-reactive({
     row_id<-input$ciri_datatable_rows_selected
-    ciri_merged()[row_id,]
-  })
-  
-  ciri_selected_sample<-reactive({
-    ciri_selected()[sample_columns] %>%
-      rows2df
+    selected<-ciri_merged()[row_id,]
+    ciri_merged() %>%
+      filter(circRNA_ID %in% selected$circRNA_ID)
   })
   
   output$rows_sample_table<-DT::renderDataTable({
-    ciri_selected_sample() %>%
+    ciri_selected()[sample_columns] %>%
+      rows2df %>%
       datatable
   })
   
-  ciri_selected_circRNA<-reactive({
+  output$rows_circRNA_table<-DT::renderDataTable({
     selected<-ciri_selected()
     circRNA_columns<-c('circRNA_ID', setdiff(names(selected), sample_columns))
     selected[circRNA_columns] %>%
       unique %>%
-      rows2df
-  })
-  
-  output$rows_circRNA_table<-DT::renderDataTable({
-    ciri_selected_circRNA() %>%
+      rows2df %>%
       datatable
   })
   
