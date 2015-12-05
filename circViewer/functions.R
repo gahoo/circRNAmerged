@@ -177,22 +177,51 @@ loadGeneRanges<-function(){
                              keep.extra.columns=T)
 }
 
+countCircRNA<-function(df, columnName){
+  df %>%
+    select(circRNA_ID) %>%
+    group_by(circRNA_ID) %>%
+    summarise(Cnts=n()) %>%
+    plyr::rename(c(Cnts=columnName))
+}
 
-annotateRmsk<-function(dfRanges){
-  hits<-findOverlaps(dfRanges, rmsk)
-  cbind(mcols(dfRanges[queryHits(hits)]),
-        as.data.frame(rmsk[subjectHits(hits)])) %>%
+addFamily<-function(df){
+  df %>%
     select(circRNA_ID, strand, name) %>%
     unique %>%
     as.data.frame %>%
-    group_by(circRNA_ID, name) %>%
+    left_join(rmsk.family)
+}
+
+countRepat<-function(df, columnName){
+  df %>%
+    group_by_('circRNA_ID', columnName) %>%
     summarise(cnt=n()) %>%
     filter(cnt==2) %>%
-    select(circRNA_ID, name) %>%
-    summarise(
-      region_repeat_type_cnt=n(),
-      region_repeat_name=paste0(name, collapse = ',')
+    select_('circRNA_ID', columnName) %>%
+    summarise_(
+      type_cnt="n()",
+      region_repeat=sprintf("paste0(%s, collapse = ',')", columnName)
+      ) %>%
+    plyr::rename(c(
+      type_cnt=paste0('repeat.',columnName,'Cnt'),
+      region_repeat=paste0('repeat.',columnName))
+      )
+}
+
+annotateRmsk<-function(dfRanges){
+  hits<-findOverlaps(dfRanges, rmsk)
+  overlapRmsk<-cbind(
+    mcols(dfRanges[queryHits(hits)]),
+    as.data.frame(rmsk[subjectHits(hits)])
     )
+    
+  repeatCnts<-countCircRNA(overlapRmsk, 'repeatCnt')
+  overlapRmskFamily<-addFamily(overlapRmsk)
+  repeatCnts %>%
+    left_join(countRepat(overlapRmskFamily, 'name')) %>%
+    left_join(countRepat(overlapRmskFamily, 'class')) %>%
+    left_join(countRepat(overlapRmskFamily, 'family'))
 }
 
 annotateGene<-function(dfRanges, GeneRanges){
