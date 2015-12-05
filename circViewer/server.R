@@ -47,15 +47,13 @@ shinyServer(function(input, output, session) {
                  detail = 'This may take a while...')
     
     if(input$anno_repeat){
-      merge(
-        annotateRmsk(ciri_rbind_gr()) %>%
-          rename(circRepeatTypeCnt=region_repeat_type_cnt,
-                 circRepeatName=region_repeat_name),
-        annotateRmsk(flank_both(ciri_rbind_gr(), input$extend_size)) %>%
-          rename(flankRepeatTypeCnt=region_repeat_type_cnt,
-                 flankRepeatName=region_repeat_name),
-        by='circRNA_ID', all=T
-      )
+      circRmsk<-annotateRmsk(ciri_rbind_gr())
+      flankRmsk<-annotateRmsk(flank_both(ciri_rbind_gr(), input$extend_size))
+      
+      colnames(circRmsk)<-gsub('repeat', 'circRepeat', colnames(circRmsk))
+      colnames(flankRmsk)<-gsub('repeat', 'flankRepeat', colnames(flankRmsk))
+      
+      merge(circRmsk, flankRmsk, by='circRNA_ID', all=T)
     }else{
       data.frame(circRNA_ID=factor())
     }
