@@ -197,7 +197,7 @@ countRepat<-function(df, columnName){
   df %>%
     group_by_('circRNA_ID', columnName) %>%
     summarise(cnt=n()) %>%
-    filter(cnt==2) %>%
+    filter(cnt>1) %>%
     select_('circRNA_ID', columnName) %>%
     summarise_(
       type_cnt="n()",
