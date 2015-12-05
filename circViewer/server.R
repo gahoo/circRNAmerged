@@ -10,6 +10,11 @@ source('functions.R')
 GeneRanges<-loadGeneRanges()
 load('rmsk_0.0.1.RData')
 load('rmsk.family.RData')
+c('circRNA_ID', 'sample', 'X.junction_reads', 'SM_MS_SMS', 'X.non_junction_reads', 
+  'junction_reads_ratio', 'junction.Normal', 'junction.Tumor',
+  'non_junction.Normal', 'non_junction.Tumor', 'ratio.Normal',
+  'ratio.Tumor', 'p.values', 'fdr') ->
+  sample_columns
 
 shinyServer(function(input, output, session) {
   output$ciri_files<-DT::renderDataTable({
@@ -63,11 +68,43 @@ shinyServer(function(input, output, session) {
     ciri_rbind() %>% rankCircRNA
   })
   
-  output$ciri_table<-DT::renderDataTable({
+  ciri_merged<-reactive({
     ciri_rbind() %>%
       #left_join(ciri_rbind_anno()) %>%
-      left_join(ciri_rbind_rmsk()) %>%
-      #left_join(ciri_rbind_rank()) %>%
+      #left_join(ciri_rbind_rmsk()) %>%
+      left_join(ciri_rbind_rank())
+  })
+  
+  output$ciri_datatable<-DT::renderDataTable({
+    ciri_merged() %>%
+      datatable
+  })
+  
+  ciri_selected<-reactive({
+    row_id<-input$ciri_datatable_rows_selected
+    ciri_merged()[row_id,]
+  })
+  
+  ciri_selected_sample<-reactive({
+    ciri_selected()[sample_columns] %>%
+      rows2df
+  })
+  
+  output$rows_sample_table<-DT::renderDataTable({
+    ciri_selected_sample() %>%
+      datatable
+  })
+  
+  ciri_selected_circRNA<-reactive({
+    selected<-ciri_selected()
+    circRNA_columns<-c('circRNA_ID', setdiff(names(selected), sample_columns))
+    selected[circRNA_columns] %>%
+      unique %>%
+      rows2df
+  })
+  
+  output$rows_circRNA_table<-DT::renderDataTable({
+    ciri_selected_circRNA() %>%
       datatable
   })
   

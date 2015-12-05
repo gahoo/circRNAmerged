@@ -34,6 +34,13 @@ shinyUI(fluidPage(
   collapsibleDiv(id='ciri_table', collapse = F,
                  label = 'CIRI',
                  class = 'btn-info btn-xs',
-                 DT::dataTableOutput('ciri_table')
+                 DT::dataTableOutput('ciri_datatable')
+  ),
+  collapsibleDiv(id='ciri_sample_table', collapse = F,
+                 label = 'circRNA',
+                 class = 'btn-info btn-xs',
+                 DT::dataTableOutput('rows_circRNA_table'),
+                 DT::dataTableOutput('rows_sample_table')
   )
+  
 ))
