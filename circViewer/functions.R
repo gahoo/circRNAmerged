@@ -276,3 +276,14 @@ rankCircRNA<-function(df) {
               ratio.rank3 = ratio.abs_diff/ratio.Diff.sd
     )
 }
+
+rows2df<-function(df){
+  lapply(1:nrow(df), function(i){
+    df[i,] %>%
+      as.list %>%
+      lapply(as.character) %>%
+      unlist %>%
+      as.data.frame
+  }) %>%
+    do.call(what=cbind)
+}
