@@ -9,6 +9,7 @@ library(dplyr)
 source('functions.R')
 GeneRanges<-loadGeneRanges()
 load('rmsk_0.0.1.RData')
+load('rmsk.family.RData')
 
 shinyServer(function(input, output, session) {
   output$ciri_files<-DT::renderDataTable({
@@ -40,15 +41,24 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_rbind_rmsk<-reactive({
-    merge(
-      annotateRmsk(ciri_rbind_gr()) %>%
-        rename(circRepeatTypeCnt=region_repeat_type_cnt,
-               circRepeatName=region_repeat_name),
-      annotateRmsk(flank_both(ciri_rbind_gr(), input$extend_size)) %>%
-        rename(flankRepeatTypeCnt=region_repeat_type_cnt,
-               flankRepeatName=region_repeat_name),
-      by='circRNA_ID', all=T
-    )
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Annotate Repeats',
+                 detail = 'This may take a while...')
+    
+    if(input$anno_repeat){
+      merge(
+        annotateRmsk(ciri_rbind_gr()) %>%
+          rename(circRepeatTypeCnt=region_repeat_type_cnt,
+                 circRepeatName=region_repeat_name),
+        annotateRmsk(flank_both(ciri_rbind_gr(), input$extend_size)) %>%
+          rename(flankRepeatTypeCnt=region_repeat_type_cnt,
+                 flankRepeatName=region_repeat_name),
+        by='circRNA_ID', all=T
+      )
+    }else{
+      data.frame(circRNA_ID=factor())
+    }
   })
   
   ciri_rbind_rank<-reactive({
@@ -57,8 +67,8 @@ shinyServer(function(input, output, session) {
   
   output$ciri_table<-DT::renderDataTable({
     ciri_rbind() %>%
-      left_join(ciri_rbind_anno()) %>%
-      #left_join(ciri_rbind_rmsk()) %>%
+      #left_join(ciri_rbind_anno()) %>%
+      left_join(ciri_rbind_rmsk()) %>%
       #left_join(ciri_rbind_rank()) %>%
       datatable
   })
