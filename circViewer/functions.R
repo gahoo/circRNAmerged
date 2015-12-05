@@ -161,7 +161,7 @@ df2GRanges<-function(df){
 loadGeneRanges<-function(){
   GeneID_SYMBOL<-AnnotationDbi::select(org.Hs.eg.db, 
                                        keys = keys(org.Hs.eg.db),
-                                       columns = c("ENTREZID", "SYMBOL")) %>%
+                                       columns = c("ENTREZID", "SYMBOL", "GENENAME")) %>%
     rename_(GENEID="ENTREZID")
   
   AnnotationDbi::select(TxDb.Hsapiens.UCSC.hg19.knownGene,
@@ -177,19 +177,37 @@ loadGeneRanges<-function(){
                              keep.extra.columns=T)
 }
 
-annotateDf<-function(dfRanges, GeneRanges){
+
+annotateRmsk<-function(dfRanges){
+  hits<-findOverlaps(dfRanges, rmsk)
+  cbind(mcols(dfRanges[queryHits(hits)]),
+        as.data.frame(rmsk[subjectHits(hits)])) %>%
+    select(circRNA_ID, strand, name) %>%
+    unique %>%
+    as.data.frame %>%
+    group_by(circRNA_ID, name) %>%
+    summarise(cnt=n()) %>%
+    filter(cnt==2) %>%
+    select(circRNA_ID, name) %>%
+    summarise(
+      region_repeat_type_cnt=n(),
+      region_repeat_name=paste0(name, collapse = ',')
+    )
+}
+
+annotateGene<-function(dfRanges, GeneRanges){
   hits<-findOverlaps(dfRanges, GeneRanges)
   cbind(mcols(dfRanges[queryHits(hits)]),
         mcols(GeneRanges[subjectHits(hits)])) %>%
     unique %>%
     as.data.frame %>%
     group_by(circRNA_ID) %>%
-    summarise(region_gene_id=paste0(GENEID, collapse = ','),
-              region_symbol=paste0(SYMBOL, collapse = ','),
-              region_gene_cnt=n()
-              #region_repaet=paste0(name, collapse = ',')
-              )
-  
+    summarise(
+      region_gene_id=paste0(GENEID, collapse = ','),
+      region_symbol=paste0(SYMBOL, collapse = ','),
+      region_gene_name=paste0(GENENAME, collapse = ';'),
+      region_gene_cnt=n()
+    )
 }
 
 extend<-function(gr, width, start=T, end=T){

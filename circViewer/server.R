@@ -28,18 +28,27 @@ shinyServer(function(input, output, session) {
       mutate(length = circRNA_end - circRNA_start)
   })
   
+  #ciri_rbind_filter? could speed up table rebuild when data is large or changing extend_size
+  #ui could use dynamic ui with add remove filter by column class
+  
   ciri_rbind_gr<-reactive({
     ciri_rbind() %>% df2GRanges
   })
   
   ciri_rbind_anno<-reactive({
-    annotateDf(ciri_rbind_gr(), GeneRanges)
+    annotateGene(ciri_rbind_gr(), GeneRanges)
   })
   
   ciri_rbind_rmsk<-reactive({
-    annotateDf(extend(ciri_rbind_gr(), input$extend_size), rmsk)
-    annotateDf(flank_both(ciri_rbind_gr(), input$extend_size), rmsk)
-    #annotateDf(ciri_rbind_gr(), rmsk)
+    merge(
+      annotateRmsk(ciri_rbind_gr()) %>%
+        rename(circRepeatTypeCnt=region_repeat_type_cnt,
+               circRepeatName=region_repeat_name),
+      annotateRmsk(flank_both(ciri_rbind_gr(), input$extend_size)) %>%
+        rename(flankRepeatTypeCnt=region_repeat_type_cnt,
+               flankRepeatName=region_repeat_name),
+      by='circRNA_ID', all=T
+    )
   })
   
   ciri_rbind_rank<-reactive({
@@ -48,9 +57,9 @@ shinyServer(function(input, output, session) {
   
   output$ciri_table<-DT::renderDataTable({
     ciri_rbind() %>%
-      #left_join(ciri_rbind_anno()) %>%
-      left_join(ciri_rbind_rmsk()) %>%
-      left_join(ciri_rbind_rank()) %>%
+      left_join(ciri_rbind_anno()) %>%
+      #left_join(ciri_rbind_rmsk()) %>%
+      #left_join(ciri_rbind_rank()) %>%
       datatable
   })
   
