@@ -77,7 +77,8 @@ shinyServer(function(input, output, session) {
       left_join(ciri_rbind_anno()) %>%
       #left_join(ciri_rbind_rmsk()) %>%
       #left_join(ciri_rbind_db()) %>%
-      left_join(ciri_rbind_rank())
+      left_join(ciri_rbind_rank()) %>%
+      filter_(.dots = c("p.values<0.1","occurrence>2") )
   })
   
   output$ciri_datatable<-DT::renderDataTable({
