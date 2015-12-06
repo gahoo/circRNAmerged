@@ -1,6 +1,7 @@
 library(UpSetR)
 library(GenomicRanges)
 library(dplyr)
+library(tidyr)
 
 loadCIRI<-function(ciri_files){
   withProgress(message = 'Loading CIRI.merge files',
@@ -10,7 +11,7 @@ loadCIRI<-function(ciri_files){
     lapply(ciri_files, function(ciri_file){
       incProgress(step_size, detail=ciri_file)
       read.table(ciri_file, sep='\t',header=T,
-                 nrow=5000
+                 nrow=100
                  ) %>%
         mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
         data
@@ -24,9 +25,9 @@ loadCIRI<-function(ciri_files){
 
 getSetDf<-function(df){
   df %>%
-    select(circRNA_ID, sample, p.values) %>%
-    mutate(p.values = 1) %>%
-    spread(sample, p.values, fill=0)
+    select(circRNA_ID, sample) %>%
+    mutate(value = 1) %>%
+    spread(sample, value, fill=0)
 }
 
 plotSampleSets<-function(df, ...){
@@ -40,6 +41,14 @@ plotSampleSets<-function(df, ...){
           decreasing=c(T,F),
           ...
     )
+}
+
+filterCnt<-function(df, cnt){
+  df %>%
+    filter(occurrence >= cnt) %>%
+    "$"('circRNA_ID') %>%
+    as.character %>%
+    unique
 }
 
 plotCircSets<-function(df, cnt=0, ...){
@@ -83,7 +92,36 @@ plotRelExpPattern<-function(df, circRNA_IDs){
     theme(axis.text.x=element_text(angle=90))
 }
 
-plotRelExpHeatmap<-function(){}
+prepareHeatmapRatio<-function(df, diff=F){
+  getRatioDf<-function(df){
+    df %>%
+      select(circRNA_ID, sample, ratio.Normal, ratio.Tumor) %>%
+      gather(type, value, starts_with("ratio")) %>% 
+      mutate(type=gsub('ratio.','',type)) %>% 
+      unite(sample_type, sample, type, sep='.') %>% 
+      spread(sample_type, value, fill=0)
+  }
+  
+  getRatioDiff<-function(df){
+    df %>%
+      select(circRNA_ID, sample, ratio.Diff) %>%
+      spread(sample, ratio.Diff, fill=0)
+  }
+  
+  if(diff){
+    df<-getRatioDiff(df) %>% 
+      mutate(color_fix_min=-1,color_fix_max=1)
+  }else{
+    df<-getRatioDf(df)
+  }
+  
+  rownames(df)<-df$circRNA_ID
+  df %>% select(-circRNA_ID) 
+}
+
+plotRelExpHeatmap<-function(df){
+  d3heatmap(df, scale = "column", colors = "Spectral")
+}
 
 getGeneArc<-function(df, symbols){
   prepare4rbind<-function(df, type){
