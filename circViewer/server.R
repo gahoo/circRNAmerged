@@ -5,6 +5,7 @@ library(ggbio)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(org.Hs.eg.db)
 library(dplyr)
+library(lazyeval)
 
 source('functions.R')
 GeneRanges<-loadGeneRanges()
@@ -72,34 +73,46 @@ shinyServer(function(input, output, session) {
     ciri_rbind() %>%
       #left_join(ciri_rbind_anno()) %>%
       #left_join(ciri_rbind_rmsk()) %>%
+      #left_join(ciri_rbind_db()) %>%
       left_join(ciri_rbind_rank())
   })
   
   output$ciri_datatable<-DT::renderDataTable({
     ciri_merged() %>%
-      datatable
+      datatable(filter='top')
   })
   
   ciri_selected<-reactive({
     row_id<-input$ciri_datatable_rows_selected
+    if(is.null(row_id)){
+      row_id<-1
+    }
     selected<-ciri_merged()[row_id,]
+    
+    columnName<-input$showBy
+    filterValues<-unique(selected[[columnName]])
+    filter_criteria <- interp(~ columnName %in% filterValues,
+                              columnName=as.name(columnName))
     ciri_merged() %>%
-      filter(circRNA_ID %in% selected$circRNA_ID)
+      filter_(filter_criteria)
   })
   
   output$rows_sample_table<-DT::renderDataTable({
+    transformerFunc<-transformer(input$col2row)
     ciri_selected()[sample_columns] %>%
-      rows2df %>%
+      transformerFunc %>%
       datatable
   })
   
   output$rows_circRNA_table<-DT::renderDataTable({
+    transformerFunc<-transformer(input$col2row)
     selected<-ciri_selected()
     circRNA_columns<-c('circRNA_ID', setdiff(names(selected), sample_columns))
     selected[circRNA_columns] %>%
       unique %>%
-      rows2df %>%
-      datatable
+      mutate(gene_id=build_a(gene_id)) %>%
+      transformerFunc %>%
+      datatable(escape = F)
   })
   
   output$helper<-renderText({
