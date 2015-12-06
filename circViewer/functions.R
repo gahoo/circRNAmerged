@@ -10,7 +10,7 @@ loadCIRI<-function(ciri_files){
     lapply(ciri_files, function(ciri_file){
       incProgress(step_size, detail=ciri_file)
       read.table(ciri_file, sep='\t',header=T,
-                 nrow=100
+                 nrow=5000
                  ) %>%
         mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
         data
@@ -82,6 +82,8 @@ plotRelExpPattern<-function(df, circRNA_IDs){
     ylab('Relative Expression Ratio') +
     theme(axis.text.x=element_text(angle=90))
 }
+
+plotRelExpHeatmap<-function(){}
 
 getGeneArc<-function(df, symbols){
   prepare4rbind<-function(df, type){
@@ -256,6 +258,7 @@ flank_both<-function(gr, width){
 
 rankCircRNA<-function(df) {
   abs_diff<-function(x){sqrt(sum(x^2)/length(x))}
+  remove_na_zero<-function(x, v=1){ifelse(is.na(x)|x==0,v,x)}
   
   df %>%
     select(circRNA_ID, ratio.Normal, ratio.Tumor) %>%
@@ -267,9 +270,9 @@ rankCircRNA<-function(df) {
               ratio.Normal.sd = sd(ratio.Normal, na.rm=T),
               ratio.Tumor.sd = sd(ratio.Tumor, na.rm=T),
               ratio.Diff.sd = sd(ratio.diff, na.rm=T),
-              #ratio.Normal.sd = ifelse(is.na(ratio.Normal.sd),1,ratio.Normal.sd),
-              #ratio.Tumor.sd = ifelse(is.na(ratio.Tumor.sd),1,ratio.Tumor.sd),
-              #ratio.Diff.sd = ifelse(is.na(ratio.Diff.sd),1,ratio.Diff.sd),
+              ratio.Normal.sd = remove_na_zero(ratio.Normal.sd),
+              ratio.Tumor.sd = remove_na_zero(ratio.Tumor.sd),
+              ratio.Diff.sd = remove_na_zero(ratio.Diff.sd),
               ratio.abs_diff = abs_diff(ratio.diff),
               ratio.rank = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd * ratio.Diff.sd),
               ratio.rank2 = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd),
@@ -286,4 +289,20 @@ rows2df<-function(df){
       as.data.frame
   }) %>%
     do.call(what=cbind)
+}
+
+doNothing<-function(df){
+  df
+}
+
+transformer<-function(transformTable){
+  if(transformTable){
+    rows2df
+  }else{
+    doNothing
+  }
+}
+
+build_a<-function(x){
+  ifelse(is.na(x), NA, sprintf('<a href="http://www.ncbi.nlm.nih.gov/gene/%s" target="_blank">%s</a>', x, x))
 }
