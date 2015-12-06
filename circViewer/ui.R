@@ -1,5 +1,7 @@
 library(shiny)
 library(DT)
+library(d3heatmap)
+
 
 collapsibleDiv<-function(id, ..., label='Show/Hide', .func=actionButton,
                          collapse = FALSE, class=NULL, icon=NULL, width=NULL){
@@ -37,17 +39,32 @@ shinyUI(fluidPage(
                  DT::dataTableOutput('ciri_datatable'),
                  selectInput('showBy', 'by:', choices = c('circRNA_ID', 'symbol'),
                              selected='circRNA_ID'),
-                 checkboxInput('col2row', 'long table', value = T)
+                 checkboxInput('col2row', 'long table', value = F)
   ),
-  collapsibleDiv(id='selected_rows_circRNA_table', collapse = F,
+  collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
                  label = 'circRNA',
                  class = 'btn-info btn-xs',
                  DT::dataTableOutput('rows_circRNA_table')
   ),
-  collapsibleDiv(id='selected_rows_sample_table', collapse = F,
+  collapsibleDiv(id='selected_rows_sample_table', collapse = T,
                  label = 'Samples',
                  class = 'btn-info btn-xs',
                  DT::dataTableOutput('rows_sample_table')
+  ),
+  collapsibleDiv(id='selected_rows_set_samples', collapse = T,
+                 label = 'SetsSamples',
+                 class = 'btn-info btn-xs',
+                 plotOutput('upset_samples')
+  ),
+  collapsibleDiv(id='selected_rows_set_circRNA', collapse = T,
+                 label = 'SetsCircRNA',
+                 class = 'btn-info btn-xs',
+                 plotOutput('upset_circRNA')
+  ),
+  collapsibleDiv(id='selected_rows_heatmap', collapse = F,
+                 label = 'ratioHeatmap',
+                 class = 'btn-info btn-xs',
+                 d3heatmapOutput('ratio_heatmap', height='700px')
   )
   
 ))

@@ -6,6 +6,8 @@ library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(org.Hs.eg.db)
 library(dplyr)
 library(lazyeval)
+library(d3heatmap)
+
 
 source('functions.R')
 GeneRanges<-loadGeneRanges()
@@ -32,7 +34,8 @@ shinyServer(function(input, output, session) {
   
   ciri_rbind<-reactive({
     df<-do.call(rbind, ciri_list()) %>%
-      mutate(length = circRNA_end - circRNA_start)
+      mutate(length = circRNA_end - circRNA_start,
+             ratio.Diff=ratio.Tumor-ratio.Normal)
   })
   
   #ciri_rbind_filter? could speed up table rebuild when data is large or changing extend_size
@@ -71,7 +74,7 @@ shinyServer(function(input, output, session) {
   
   ciri_merged<-reactive({
     ciri_rbind() %>%
-      #left_join(ciri_rbind_anno()) %>%
+      left_join(ciri_rbind_anno()) %>%
       #left_join(ciri_rbind_rmsk()) %>%
       #left_join(ciri_rbind_db()) %>%
       left_join(ciri_rbind_rank())
@@ -79,7 +82,7 @@ shinyServer(function(input, output, session) {
   
   output$ciri_datatable<-DT::renderDataTable({
     ciri_merged() %>%
-      datatable(filter='top')
+      datatable(filter='none')
   })
   
   ciri_selected<-reactive({
@@ -97,22 +100,61 @@ shinyServer(function(input, output, session) {
       filter_(filter_criteria)
   })
   
-  output$rows_sample_table<-DT::renderDataTable({
-    transformerFunc<-transformer(input$col2row)
-    ciri_selected()[sample_columns] %>%
-      transformerFunc %>%
-      datatable
-  })
-  
-  output$rows_circRNA_table<-DT::renderDataTable({
+  selected_rows_circRNA<-reactive({
     transformerFunc<-transformer(input$col2row)
     selected<-ciri_selected()
     circRNA_columns<-c('circRNA_ID', setdiff(names(selected), sample_columns))
     selected[circRNA_columns] %>%
       unique %>%
       mutate(gene_id=build_a(gene_id)) %>%
-      transformerFunc %>%
+      transformerFunc
+  })
+  
+  output$rows_circRNA_table<-DT::renderDataTable({
+    selected_rows_circRNA() %>%
       datatable(escape = F)
+  })
+  
+  selected_rows_samples<-reactive({
+    transformerFunc<-transformer(input$col2row)
+    ciri_selected()[sample_columns] %>%
+      transformerFunc
+  })
+  
+  output$rows_sample_table<-DT::renderDataTable({
+    selected_rows_samples() %>%
+      datatable
+  })
+  
+  output$upset_samples<-renderPlot({
+    ciri_selected() %>%
+      plotSampleSets
+  })
+  
+  output$upset_circRNA<-renderPlot({
+    ciri_selected() %>%
+      plotCircSets
+  })
+  
+  output$ratio_heatmap<-renderD3heatmap({
+    colpan<-getColorFunc<-function(mat, palette){  
+      mi <- min(mat, na.rm = TRUE)
+      ma <- max(mat, na.rm = TRUE)
+      breaks <- c(mi, 0, ma)
+      col_numeric(palette, domain = rescale(breaks))
+    }
+    
+    #colpan(ratio, rev(brewer.pal(3,"RdYlGn")))
+    
+    colpan<-col_numeric("RdYlGn", domain = c(-1,0,1))
+    
+    ciri_selected() %>%
+      prepareHeatmapRatio(diff=T) ->
+      ratio
+    ratio %>%
+      d3heatmap(colors = rev(brewer.pal(3,"RdYlGn")),dendrogram='column',
+                xaxis_height=150, yaxis_width=300)
+      #d3heatmap(colors = "Reds",xaxis_height=150, yaxis_width=300)
   })
   
   output$helper<-renderText({
