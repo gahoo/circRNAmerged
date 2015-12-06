@@ -36,13 +36,17 @@ shinyUI(fluidPage(
                  class = 'btn-info btn-xs',
                  DT::dataTableOutput('ciri_datatable'),
                  selectInput('showBy', 'by:', choices = c('circRNA_ID', 'symbol'),
-                             selected='circRNA_ID')
+                             selected='circRNA_ID'),
+                 checkboxInput('col2row', 'long table', value = T)
   ),
-  collapsibleDiv(id='ciri_sample_table', collapse = F,
+  collapsibleDiv(id='selected_rows_circRNA_table', collapse = F,
                  label = 'circRNA',
                  class = 'btn-info btn-xs',
-                 checkboxInput('col2row', 'long table', value = T),
-                 DT::dataTableOutput('rows_circRNA_table'),
+                 DT::dataTableOutput('rows_circRNA_table')
+  ),
+  collapsibleDiv(id='selected_rows_sample_table', collapse = F,
+                 label = 'Samples',
+                 class = 'btn-info btn-xs',
                  DT::dataTableOutput('rows_sample_table')
   )
   
