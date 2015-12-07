@@ -122,14 +122,20 @@ prepareHeatmapRatio<-function(df, diff=F){
       spread(sample, ratio.Diff, fill=0)
   }
   
+  anno<-addSymbolAnno(df)
+  
   if(diff){
     df<-getRatioDiff(df) %>% mutate(color_fix_min=-1,color_fix_max=1)
   }else{
     df<-getRatioDf(df)
   }
   
-  rownames(df)<-df$circRNA_ID
-  df %>% select(-circRNA_ID) 
+  df %>%
+    left_join(anno) ->
+    df
+  
+  rownames(df)<-df$anno
+  df %>% select(-circRNA_ID, -anno)
 }
 
 plotRelExpHeatmap<-function(df){
@@ -356,4 +362,27 @@ transformer<-function(transformTable){
 
 build_a<-function(x){
   ifelse(is.na(x), NA, sprintf('<a href="http://www.ncbi.nlm.nih.gov/gene/%s" target="_blank">%s</a>', x, x))
+}
+
+addCriteria<-function(column_name, filter_string, df_class, criteria){
+  if(column_name!='free'){
+    column_class<-df_class[[column_name]]
+    if(column_class %in% c('factor', 'character')){
+      filter_string<-sprintf('grepl("%s", as.character(%s))',
+                             filter_string, column_name)
+    }else if(column_class %in% c('numeric', 'integer')){
+      filter_string<-sprintf('%s%s', column_name, filter_string)
+    }else if(column_class %in% c('logical')){
+      filter_string<-sprintf('%s%s', column_name, filter_string)
+    }
+  }
+  
+  if(filter_string %in% criteria){
+    criteria
+  }else{
+    n<-length(criteria)+1
+    criteria[[n]]<-filter_string
+  }
+  
+  criteria
 }
