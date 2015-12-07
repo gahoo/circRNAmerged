@@ -44,9 +44,12 @@ shinyUI(fluidPage(
                  actionButton('clear_filter','Clear'),
                  verbatimTextOutput('criteria'),
                  DT::dataTableOutput('ciri_datatable'),
-                 selectInput('showBy', 'by:', choices = c('circRNA_ID', 'symbol'),
+                 selectInput('subsettingBy', 'subsetting by:',
+                             choices = c('rows', 'pages', 'none'),
+                             selected = 'rows'),
+                 selectInput('showBy', 'show by:', choices = c('circRNA_ID', 'symbol'),
                              selected='circRNA_ID'),
-                 checkboxInput('col2row', 'long table', value = F)
+                 checkboxInput('col2row', 'colums 2 rows', value = F)
   ),
   collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
                  label = 'circRNA',
