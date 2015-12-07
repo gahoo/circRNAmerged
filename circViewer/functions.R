@@ -51,15 +51,28 @@ filterCnt<-function(df, cnt){
     unique
 }
 
+
+addSymbolAnno<-function(df){
+  df %>%
+    select(circRNA_ID, symbol, region_symbol) %>%
+    unique %>%
+  mutate_each(funs(as.character)) %>%
+  mutate(
+    region_symbol = ifelse(is.na(region_symbol), '', region_symbol),
+    anno = sprintf(
+      "%s|%s", circRNA_ID,
+      ifelse(is.na(symbol), region_symbol, symbol))
+    ) %>%
+  select(circRNA_ID, anno)
+}
+
 plotCircSets<-function(df, cnt=0, ...){
   candidates<-filterCnt(df, cnt)
   df_set<-getSetDf(df)
   df_set_t<-df_set
   df_set %>%
-    left_join(unique(df[c('circRNA_ID', 'symbol', 'region_symbol')]), by='circRNA_ID') %>%
-    mutate(anno = sprintf("%s.%s", 
-                          ifelse(is.na(symbol), region_symbol, as.character(symbol)),
-                          circRNA_ID)) -> df_set
+    left_join(addSymbolAnno(df)) ->
+    df_set
   row.names(df_set_t)<-unique(df_set$anno)
   df_set %>%
     filter(circRNA_ID %in% candidates) %>%
@@ -78,11 +91,12 @@ plotRelExpPattern<-function(df, circRNA_IDs){
     gather(type,ratio,ratio.Normal,ratio.Tumor) %>%
     mutate(type=gsub('ratio.','',type),
            significant=p.values<=0.05,
-           log10P=log10(p.values),
-           anno = sprintf("%s\n%s", 
-                          ifelse(is.na(symbol), region_symbol, as.character(symbol)),
-                          circRNA_ID)
+           log10P=log10(p.values)
+           #anno = sprintf("%s\n%s", 
+           #              ifelse(is.na(symbol), region_symbol, as.character(symbol)),
+           #              circRNA_ID)
     ) %>%
+    left_join(addSymbolAnno(df)) %>%
     ggplot(aes(x=sample, y=ratio, group=type, color=type)) + 
     geom_line() +
     geom_point(aes(size=-log10P, alpha=significant)) +
@@ -109,8 +123,7 @@ prepareHeatmapRatio<-function(df, diff=F){
   }
   
   if(diff){
-    df<-getRatioDiff(df) %>% 
-      mutate(color_fix_min=-1,color_fix_max=1)
+    df<-getRatioDiff(df) %>% mutate(color_fix_min=-1,color_fix_max=1)
   }else{
     df<-getRatioDf(df)
   }
