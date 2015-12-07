@@ -64,6 +64,14 @@ shinyUI(fluidPage(
   collapsibleDiv(id='selected_rows_heatmap', collapse = F,
                  label = 'ratioHeatmap',
                  class = 'btn-info btn-xs',
+                 checkboxInput('diff_ratio', 'Diff Ratio', value = F),
+                 checkboxInput('d3heatmap_symm', 'symm', value = F),
+                 selectInput('d3heatmap_dendrogram', 'dendrogram',
+                             choices=c('none', 'row', 'column', 'both'),
+                             selected='both'),
+                 selectInput('d3heatmap_scale', 'scale',
+                             choices=c('none', 'row', 'column'),
+                             selected='none'),
                  d3heatmapOutput('ratio_heatmap', height='700px')
   )
   

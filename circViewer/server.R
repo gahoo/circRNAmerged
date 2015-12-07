@@ -7,6 +7,7 @@ library(org.Hs.eg.db)
 library(dplyr)
 library(lazyeval)
 library(d3heatmap)
+library(RColorBrewer)
 
 
 source('functions.R')
@@ -138,24 +139,19 @@ shinyServer(function(input, output, session) {
   })
   
   output$ratio_heatmap<-renderD3heatmap({
-    colpan<-getColorFunc<-function(mat, palette){  
-      mi <- min(mat, na.rm = TRUE)
-      ma <- max(mat, na.rm = TRUE)
-      breaks <- c(mi, 0, ma)
-      col_numeric(palette, domain = rescale(breaks))
+    if(input$diff_ratio){
+      colors_scheme = rev(brewer.pal(3,"RdYlGn"))
+    }else{
+      colors_scheme = 'Blues'
     }
     
-    #colpan(ratio, rev(brewer.pal(3,"RdYlGn")))
-    
-    colpan<-col_numeric("RdYlGn", domain = c(-1,0,1))
-    
     ciri_selected() %>%
-      prepareHeatmapRatio(diff=T) ->
-      ratio
-    ratio %>%
-      d3heatmap(colors = rev(brewer.pal(3,"RdYlGn")),dendrogram='column',
+      prepareHeatmapRatio(diff=input$diff_ratio) %>%
+      d3heatmap(colors = colors_scheme,
+                dendrogram = input$d3heatmap_dendrogram,
+                scale = input$d3heatmap_scale,
+                symm = input$d3heatmap_symm,
                 xaxis_height=150, yaxis_width=300)
-      #d3heatmap(colors = "Reds",xaxis_height=150, yaxis_width=300)
   })
   
   output$helper<-renderText({
