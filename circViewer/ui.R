@@ -2,6 +2,7 @@ library(shiny)
 library(DT)
 library(d3heatmap)
 
+inlineDiv<-function(...){div(style="display:inline-block", ...)}
 
 collapsibleDiv<-function(id, ..., label='Show/Hide', .func=actionButton,
                          collapse = FALSE, class=NULL, icon=NULL, width=NULL){
@@ -36,6 +37,12 @@ shinyUI(fluidPage(
   collapsibleDiv(id='ciri_table', collapse = F,
                  label = 'CIRI',
                  class = 'btn-info btn-xs',
+                 inlineDiv(uiOutput('ciri_filtering_column')),
+                 inlineDiv(textInput('ciri_filter_string', '')),
+                 actionButton('add_filter','Add'),
+                 actionButton('remove_filter','Remove'),
+                 actionButton('clear_filter','Clear'),
+                 verbatimTextOutput('criteria'),
                  DT::dataTableOutput('ciri_datatable'),
                  selectInput('showBy', 'by:', choices = c('circRNA_ID', 'symbol'),
                              selected='circRNA_ID'),

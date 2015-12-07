@@ -79,12 +79,47 @@ shinyServer(function(input, output, session) {
       #left_join(ciri_rbind_rmsk()) %>%
       #left_join(ciri_rbind_db()) %>%
       left_join(ciri_rbind_rank()) %>%
-      filter_(.dots = c("p.values<0.1","occurrence>2") )
+      filter_(.dots = filtering[['criteria']] )
   })
   
   output$ciri_datatable<-DT::renderDataTable({
     ciri_merged() %>%
-      datatable(filter='none')
+      datatable(filter='top', options=list(stateSave = TRUE) )
+  })
+  
+  ciri_column_class<-reactive({
+    ciri_merged() %>%
+      sapply(class) %>%
+      as.list
+  })
+  
+  output$ciri_filtering_column<-renderUI({
+    selectInput('ciri_filtering_column', 'Filter',
+                choices = c('free', names(ciri_merged())),
+                selected = 'circRNA_ID')
+  })
+  
+  filtering<-reactiveValues(criteria=list())
+  
+  observeEvent(input$add_filter,{
+    addCriteria(input$ciri_filtering_column, 
+                input$ciri_filter_string,
+                ciri_column_class(),
+                filtering[['criteria']]) ->
+      filtering[['criteria']]
+  })
+  
+  observeEvent(input$remove_filter,{
+    n<-length(filtering[['criteria']])
+    filtering[['criteria']][[n]]<-NULL
+  })
+  
+  observeEvent(input$clear_filter,{
+    filtering[['criteria']]<-list()
+  })
+  
+  output$criteria<-renderText({
+    filtering[['criteria']] %>% paste(collapse = ', ')
   })
   
   ciri_selected<-reactive({
@@ -151,10 +186,13 @@ shinyServer(function(input, output, session) {
                 dendrogram = input$d3heatmap_dendrogram,
                 scale = input$d3heatmap_scale,
                 symm = input$d3heatmap_symm,
-                xaxis_height=150, yaxis_width=300)
+                xaxis_height=150, yaxis_width=350)
   })
   
   output$helper<-renderText({
-    #names(ciri_rbind())
+    str(input$ciri_datatable_rows_all)
+    str(input$ciri_datatable_search_columns)
+    str(filtering[['criteria']])
+    input$add_filter
   })
 })
