@@ -22,7 +22,7 @@ collapsibleDiv<-function(id, ..., label='Show/Hide', .func=actionButton,
 }
 
 shinyUI(fluidPage(
-  titlePanel("circRNA BAM Viewer"),
+  titlePanel("circRNA Viewer"),
   textOutput('helper'),
   collapsibleDiv(id='settings', collapse = T,
                  label = 'settings',
@@ -56,7 +56,8 @@ shinyUI(fluidPage(
                                 selectInput('subsettingBy', 'subsetting by:',
                                             choices = c('rows', 'pages', 'none'),
                                             selected = 'rows'),
-                                selectInput('showBy', 'show by:', choices = c('circRNA_ID', 'symbol'),
+                                selectInput('showBy', 'show by:',
+                                            choices = c('circRNA_ID', 'symbol'),
                                             selected='circRNA_ID'),
                                 checkboxInput('col2row', 'colums 2 rows', value = F)
                  )
@@ -84,9 +85,19 @@ shinyUI(fluidPage(
   collapsibleDiv(id='selected_rows_ratio_pattern', collapse = F,
                  label = 'ratioPattern',
                  class = 'btn-info btn-xs',
-                 checkboxInput('ratio_pattern_facet','facet',value=T),
-                 checkboxInput('ratio_pattern_map_significant','map significant to alpha',value=T),
-                 checkboxInput('ratio_pattern_line','connect dots',value=T),
+                 collapsibleDiv(id='pattern_controls', collapse = F,
+                                label = 'ratioPatternControls',
+                                class = 'btn-success btn-xs pull-right',
+                                icon = icon('info-sign',lib='glyphicon'),
+                                checkboxInput('ratio_pattern_facet','facet',value=T),
+                                checkboxInput('ratio_pattern_map_significant',
+                                              'significant dots only',value=T),
+                                numericInput('ratio_pattern_p', 'P value <= ',
+                                             value = 0.05, step = 0.005,
+                                             min = 0, max = 1),
+                                checkboxInput('ratio_pattern_line',
+                                              'connect dots',value=T)
+                 ),
                  plotOutput('ratio_pattern', height="700px")
   ),
   collapsibleDiv(id='selected_rows_heatmap', collapse = T,
