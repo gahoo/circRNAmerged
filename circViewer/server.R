@@ -134,9 +134,8 @@ shinyServer(function(input, output, session) {
       if(is.null(row_id)){
         row_id<-1
       }
-      selected<-ciri_merged()[row_id,] %>% fixSymbol
       
-      str(selected)
+      selected<-ciri_merged()[row_id,] %>% fixSymbol
       
       columnName<-input$showBy
       filterValues<-unique(selected[[columnName]])
