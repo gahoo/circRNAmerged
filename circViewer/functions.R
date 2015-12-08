@@ -1,7 +1,11 @@
 library(UpSetR)
 library(GenomicRanges)
+library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(dplyr)
 library(tidyr)
+
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+data(genesymbol, package = "biovizBase")
 
 loadCIRI<-function(ciri_files){
   withProgress(message = 'Loading CIRI.merge files',
@@ -90,28 +94,25 @@ plotRelExpPattern<-function(df, facet=T, significant2alpha=T, line=T){
     gather(type,ratio,ratio.Normal,ratio.Tumor) %>%
     mutate(type=gsub('ratio.','',type),
            significant=p.values<=0.05,
-           log10P=log10(p.values)
-           #anno = sprintf("%s\n%s", 
-           #              ifelse(is.na(symbol), region_symbol, as.character(symbol)),
-           #              circRNA_ID)
-    ) %>%
+           log10P=log10(p.values) ) %>%
     left_join(addSymbolAnno(df)) %>%
     ggplot(aes(x=sample, y=ratio, group=type)) + 
-    #scale_size_continuous(range=c(2,8)) +
     ylab('Relative Expression Ratio') +
     theme(axis.text.x=element_text(angle=90)) ->
     p
+  
   if(significant2alpha&facet){
     point_aes<-aes(size=-log10P, alpha=significant, color=type)
     p <- p + facet_grid(anno~.)
   }else if(significant2alpha&!facet){
-    point_aes<-aes(size=-log10P, alpha=significant, color=anno)
+    point_aes<-aes(size=-log10P, alpha=significant, color=anno, shape=type)
   }else if(!significant2alpha&facet){
-    point_aes<-aes(size=-log10P, color=type)
+    point_aes<-aes(size=-log10P, color=type, shape=type)
     p <- p + facet_grid(anno~.)
   }else if(!significant2alpha&!facet){
     point_aes<-aes(size=-log10P, color=anno)
   }
+  
   if(line){
     p<-p + geom_line(aes(color=type))
   }
@@ -155,7 +156,7 @@ plotRelExpHeatmap<-function(df){
   d3heatmap(df, scale = "column", colors = "Spectral")
 }
 
-getGeneArc<-function(df, symbols){
+prepareArc<-function(df){
   prepare4rbind<-function(df, type){
     df %>% 
       select(circRNA_ID, chr, circRNA_start, circRNA_end,
@@ -169,16 +170,17 @@ getGeneArc<-function(df, symbols){
   }
   
   df %>%
-    filter(symbol %in% symbols|region_symbol %in% symbols) %>%
     select(circRNA_ID, chr, circRNA_start, circRNA_end, circRNA_type,
-                  junction.Normal, junction.Tumor, 
-                  non_junction.Normal,non_junction.Tumor,
-                  ratio.Normal, ratio.Tumor,p.values, sample) ->
+           junction.Normal, junction.Tumor, 
+           non_junction.Normal,non_junction.Tumor,
+           ratio.Normal, ratio.Tumor,p.values, sample) ->
     df
   rbind(
     df %>% prepare4rbind(type='Normal'),
     df %>% prepare4rbind(type='Tumor')
-  )
+  ) %>%
+    filter(junction > 0) %>%
+    makeGRangesFromDataFrame(keep.extra.columns=T)
 }
 
 plotArc<-function(arc){
@@ -186,7 +188,6 @@ plotArc<-function(arc){
     message("empty")
     NULL
   }else{
-    message(length(arc))
     ggbio() +
       geom_arch(
         data=arc,
@@ -195,16 +196,40 @@ plotArc<-function(arc){
         alpha = 0.4,
         facets = sample ~ .) +
       scale_size(range = c(0, 6))
-    
   }
 }
 
 
-plotTrack<-function(df, symbol, reads_cnt=0){
+plotTrack<-function(df){
+  checkSymbol<-function(df){
+    df$symbol %>%
+      unique %>%
+      is.na %>%
+      sum ->
+      symbol_cnt
+    
+    symbol_cnt == 1
+  }
+  
+  getSymbol<-function(df){
+    df %>%
+      select(symbol, region_symbol) %>%
+      unique %>%
+      mutate_each(funs(as.character)) %>%
+      mutate(
+        symbol = ifelse(is.na(symbol), region_symbol, symbol)
+      ) %>%
+      "$"("symbol")
+  }
+  
+  if(checkSymbol(df)){
+    return(NULL)
+  }else{
+    symbol<-getSymbol(df)
+  }
+  
   df %>%
-    getGeneArc(symbols=symbol) %>%
-    filter(junction >= reads_cnt) %>%
-    makeGRangesFromDataFrame(keep.extra.columns=T) %>%
+    prepareArc %>%
     plotArc ->
     arc
   
