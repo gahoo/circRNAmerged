@@ -134,13 +134,16 @@ shinyServer(function(input, output, session) {
       if(is.null(row_id)){
         row_id<-1
       }
-      selected<-ciri_merged()[row_id,]
+      selected<-ciri_merged()[row_id,] %>% fixSymbol
+      
+      str(selected)
       
       columnName<-input$showBy
       filterValues<-unique(selected[[columnName]])
       filter_criteria <- interp(~ columnName %in% filterValues,
                                 columnName=as.name(columnName))
       ciri_merged() %>%
+        fixSymbol %>%
         filter_(filter_criteria)
     }
   })
@@ -227,6 +230,13 @@ shinyServer(function(input, output, session) {
                 symm = input$d3heatmap_symm,
                 margins = c(input$heatmap2_height, input$heatmap2_width),
                 trace = 'none')
+  })
+  
+  output$arc_plot<-renderPlot({
+    ciri_selected() %>%
+      plotTrack(
+        plotTranscript=input$track_transcript
+        )
   })
   
   output$helper<-renderText({

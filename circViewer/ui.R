@@ -100,7 +100,7 @@ shinyUI(fluidPage(
                  ),
                  plotOutput('ratio_pattern', height="700px")
   ),
-  collapsibleDiv(id='selected_rows_heatmap', collapse = F,
+  collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                  label = 'ratioHeatmap',
                  class = 'btn-info btn-xs',
                  collapsibleDiv(
@@ -135,6 +135,17 @@ shinyUI(fluidPage(
                             plotOutput('ratio_heatmap2', height="700px")
                             )
                    )
+  ),
+  collapsibleDiv(id='selected_rows_arc', collapse = F,
+                 label = 'arcPlot',
+                 class = 'btn-info btn-xs',
+                 collapsibleDiv(
+                   id='arc_controls', collapse = F,
+                   label = 'arcControls',
+                   class = 'btn-success btn-xs pull-right',
+                   icon = icon('info-sign',lib='glyphicon'),
+                   checkboxInput('track_transcript', 'plot transcript', value=F)
+                 ),
+                 plotOutput('arc_plot', height='700px')
   )
-  
 ))
