@@ -198,12 +198,35 @@ shinyServer(function(input, output, session) {
     }
     
     ciri_selected() %>%
-      prepareHeatmapRatio(diff=input$diff_ratio) %>%
+      prepareHeatmapRatio(diff=input$diff_ratio, color_fix=T) %>%
       d3heatmap(colors = colors_scheme,
                 dendrogram = input$d3heatmap_dendrogram,
                 scale = input$d3heatmap_scale,
                 symm = input$d3heatmap_symm,
                 xaxis_height=150, yaxis_width=350)
+  })
+  
+  output$ratio_heatmap2<-renderPlot({
+    if(input$diff_ratio){
+      colors_scheme = function(n){colorpanel(n, "green", "yellow", "red")}
+      isSymbreaks <- T
+    }else{
+      colors_scheme = function(n){colorpanel(n, "white", "blue")}
+      isSymbreaks <- F
+    }
+    
+    ciri_selected() %>%
+      prepareHeatmapRatio(
+        diff=input$diff_ratio,
+        color_fix=F) %>%
+      as.matrix %>%
+      heatmap.2(col = colors_scheme,
+                symbreaks = isSymbreaks,
+                dendrogram = input$d3heatmap_dendrogram,
+                scale = input$d3heatmap_scale,
+                symm = input$d3heatmap_symm,
+                margins = c(input$heatmap2_height, input$heatmap2_width),
+                trace = 'none')
   })
   
   output$helper<-renderText({

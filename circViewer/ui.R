@@ -82,7 +82,7 @@ shinyUI(fluidPage(
                  class = 'btn-info btn-xs',
                  plotOutput('upset_circRNA', height="700px")
   ),
-  collapsibleDiv(id='selected_rows_ratio_pattern', collapse = F,
+  collapsibleDiv(id='selected_rows_ratio_pattern', collapse = T,
                  label = 'ratioPattern',
                  class = 'btn-info btn-xs',
                  collapsibleDiv(id='pattern_controls', collapse = F,
@@ -100,23 +100,41 @@ shinyUI(fluidPage(
                  ),
                  plotOutput('ratio_pattern', height="700px")
   ),
-  collapsibleDiv(id='selected_rows_heatmap', collapse = T,
+  collapsibleDiv(id='selected_rows_heatmap', collapse = F,
                  label = 'ratioHeatmap',
                  class = 'btn-info btn-xs',
-                 collapsibleDiv(id='heatmap_controls', collapse = F,
-                                label = 'heatmapControls',
-                                class = 'btn-success btn-xs pull-right',
-                                icon = icon('info-sign',lib='glyphicon'),
-                                checkboxInput('diff_ratio', 'Diff Ratio', value = F),
-                                checkboxInput('d3heatmap_symm', 'symm', value = F),
-                                selectInput('d3heatmap_dendrogram', 'dendrogram',
-                                            choices=c('none', 'row', 'column', 'both'),
-                                            selected='both'),
-                                selectInput('d3heatmap_scale', 'scale',
-                                            choices=c('none', 'row', 'column'),
-                                            selected='none')
+                 collapsibleDiv(
+                   id='heatmap_controls', collapse = F,
+                   label = 'heatmapControls',
+                   class = 'btn-success btn-xs pull-right',
+                   icon = icon('info-sign',lib='glyphicon'),
+                   column(
+                     6,
+                     checkboxInput('diff_ratio', 'Diff Ratio', value = F),
+                     checkboxInput('d3heatmap_symm', 'symm', value = F),
+                     selectInput('d3heatmap_dendrogram', 'dendrogram',
+                                 choices=c('none', 'row', 'column', 'both'),
+                                 selected='both'),
+                     selectInput('d3heatmap_scale', 'scale',
+                                 choices=c('none', 'row', 'column'),
+                                 selected='none')
+                           ),
+                   column(
+                     6,
+                     numericInput('heatmap2_width', 'circRNA_ID label width',
+                                  value = 25, min=5, max=50),
+                     numericInput('heatmap2_height', 'sample label height',
+                                  value = 12, min=5, max=50)
+                            )
                  ),
-                 d3heatmapOutput('ratio_heatmap', height='700px')
+                 tabsetPanel(
+                   tabPanel('d3heatmap',
+                            d3heatmapOutput('ratio_heatmap', height='700px')
+                            ),
+                   tabPanel('heatmap.2',
+                            plotOutput('ratio_heatmap2', height="700px")
+                            )
+                   )
   )
   
 ))
