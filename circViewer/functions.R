@@ -215,6 +215,28 @@ fixSymbol<-function(df){
     )
 }
 
+prepareRepeat<-function(df, extend_size=0, flank_only=F, column_name='repeat.name'){
+  df %>%
+    df2GRanges ->
+    which
+  which %>%
+    annotateRmsk %>%
+    "[["(column_name) %>%
+    strsplit(split=',') %>%
+    unlist %>%
+    unique ->
+    duplicated_names
+  
+  repeats <- subsetByOverlaps(rmsk, which, ignore.strand=T)
+  mcols(repeats) %>%
+    as.data.frame %>%
+    left_join(rmsk.family) %>%
+    "[["(gsub("repeat.","",column_name)) %>%
+    "%in%"(duplicated_names) ->
+    dup_idx
+  repeats[dup_idx]
+}
+
 plotTrack<-function(df, plotTranscript=T){
   
   getSymbol<-function(df){
