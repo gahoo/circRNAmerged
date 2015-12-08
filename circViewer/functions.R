@@ -60,7 +60,7 @@ addSymbolAnno<-function(df){
   mutate(
     region_symbol = ifelse(is.na(region_symbol), '', region_symbol),
     anno = sprintf(
-      "%s|%s", circRNA_ID,
+      "%s\n%s", circRNA_ID,
       ifelse(is.na(symbol), region_symbol, symbol))
     ) %>%
   select(circRNA_ID, anno)
@@ -84,10 +84,9 @@ plotCircSets<-function(df, cnt=0, ...){
 
 
 
-plotRelExpPattern<-function(df, circRNA_IDs){
+plotRelExpPattern<-function(df, facet=T, significant2alpha=T, line=T){
   df %>%
-    filter(circRNA_ID %in% circRNA_IDs) %>%
-    select(ratio.Normal, ratio.Tumor, sample, circRNA_ID, p.values, symbol, region_symbol) %>%
+    select(ratio.Normal, ratio.Tumor, sample, circRNA_ID, p.values) %>%
     gather(type,ratio,ratio.Normal,ratio.Tumor) %>%
     mutate(type=gsub('ratio.','',type),
            significant=p.values<=0.05,
@@ -97,13 +96,27 @@ plotRelExpPattern<-function(df, circRNA_IDs){
            #              circRNA_ID)
     ) %>%
     left_join(addSymbolAnno(df)) %>%
-    ggplot(aes(x=sample, y=ratio, group=type, color=type)) + 
-    geom_line() +
-    geom_point(aes(size=-log10P, alpha=significant)) +
+    ggplot(aes(x=sample, y=ratio, group=type)) + 
     #scale_size_continuous(range=c(2,8)) +
-    facet_grid(anno~.) +
     ylab('Relative Expression Ratio') +
-    theme(axis.text.x=element_text(angle=90))
+    theme(axis.text.x=element_text(angle=90)) ->
+    p
+  if(significant2alpha&facet){
+    point_aes<-aes(size=-log10P, alpha=significant, color=type)
+    p <- p + facet_grid(anno~.)
+  }else if(significant2alpha&!facet){
+    point_aes<-aes(size=-log10P, alpha=significant, color=anno)
+  }else if(!significant2alpha&facet){
+    point_aes<-aes(size=-log10P, color=type)
+    p <- p + facet_grid(anno~.)
+  }else if(!significant2alpha&!facet){
+    point_aes<-aes(size=-log10P, color=anno)
+  }
+  if(line){
+    p<-p + geom_line(aes(color=type))
+  }
+  
+  p + geom_point(point_aes)
 }
 
 prepareHeatmapRatio<-function(df, diff=F){
@@ -122,7 +135,7 @@ prepareHeatmapRatio<-function(df, diff=F){
       spread(sample, ratio.Diff, fill=0)
   }
   
-  anno<-addSymbolAnno(df)
+  anno<-addSymbolAnno(df) %>% mutate(anno=gsub('\n','\t',anno))
   
   if(diff){
     df<-getRatioDiff(df) %>% mutate(color_fix_min=-1,color_fix_max=1)

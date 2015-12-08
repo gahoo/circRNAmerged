@@ -182,6 +182,14 @@ shinyServer(function(input, output, session) {
       plotCircSets
   })
   
+  output$ratio_pattern<-renderPlot({
+    ciri_selected() %>%
+      plotRelExpPattern(
+        facet=input$ratio_pattern_facet,
+        significant2alpha=input$ratio_pattern_map_significant,
+        line=input$ratio_pattern_line)
+  })
+  
   output$ratio_heatmap<-renderD3heatmap({
     if(input$diff_ratio){
       colors_scheme = rev(brewer.pal(3,"RdYlGn"))

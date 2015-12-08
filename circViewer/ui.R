@@ -81,7 +81,15 @@ shinyUI(fluidPage(
                  class = 'btn-info btn-xs',
                  plotOutput('upset_circRNA', height="700px")
   ),
-  collapsibleDiv(id='selected_rows_heatmap', collapse = F,
+  collapsibleDiv(id='selected_rows_ratio_pattern', collapse = F,
+                 label = 'ratioPattern',
+                 class = 'btn-info btn-xs',
+                 checkboxInput('ratio_pattern_facet','facet',value=T),
+                 checkboxInput('ratio_pattern_map_significant','map significant to alpha',value=T),
+                 checkboxInput('ratio_pattern_line','connect dots',value=T),
+                 plotOutput('ratio_pattern', height="700px")
+  ),
+  collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                  label = 'ratioHeatmap',
                  class = 'btn-info btn-xs',
                  collapsibleDiv(id='heatmap_controls', collapse = F,
