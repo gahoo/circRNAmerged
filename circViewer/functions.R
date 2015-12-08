@@ -206,33 +206,32 @@ plotArc<-function(arc){
   }
 }
 
+fixSymbol<-function(df){
+  df %>%
+    mutate(
+      symbol = as.character(symbol),
+      region_symbol = as.character(region_symbol),
+      symbol = ifelse(is.na(symbol), region_symbol, symbol)
+    )
+}
 
-plotTrack<-function(df){
-  checkSymbol<-function(df){
-    df$symbol %>%
-      unique %>%
-      is.na %>%
-      sum ->
-      symbol_cnt
-    
-    symbol_cnt == 1
-  }
+plotTrack<-function(df, plotTranscript=T){
   
   getSymbol<-function(df){
     df %>%
       select(symbol, region_symbol) %>%
       unique %>%
-      mutate_each(funs(as.character)) %>%
-      mutate(
-        symbol = ifelse(is.na(symbol), region_symbol, symbol)
-      ) %>%
-      "$"("symbol")
+      fixSymbol %>%
+      "$"("symbol") %>%
+      strsplit(split=',') %>%
+      unlist %>%
+      unique
+      
   }
   
-  if(checkSymbol(df)){
-    return(NULL)
-  }else{
-    symbol<-getSymbol(df)
+  symbol <- getSymbol(df)
+  if(length(unique(df$circRNA_ID)) > 200){
+    return('too many circRNA')
   }
   
   df %>%
@@ -240,15 +239,24 @@ plotTrack<-function(df){
     plotArc ->
     arc
   
-  which_gene<-genesymbol[symbol]
-  transcripts <- ggbio() + geom_alignment(data=txdb, which = which_gene )
+  if(plotTranscript & length(symbol) > 0 ){
+    which_gene<-genesymbol[symbol]
+    transcripts <- ggbio() + geom_alignment(data=txdb, which = which_gene )
+    track_height <- c(3,1)
+    track_title <- paste0(symbol, collapse = "|")
+  }else{
+    transcripts <- NULL
+    track_height <- 1
+    track_title <- paste0(unique(df$circRNA_ID), collapse = "; ")
+  }
+  
   track_list<-list(
     arc=arc,
     transcripts=transcripts
   )
   
   track_list<-track_list[!sapply(track_list, is.null)]
-  tracks(track_list, title=symbol, heights = c(3,1))
+  tracks(track_list, title=track_title, heights = track_height)
 }
 
 df2GRanges<-function(df){
