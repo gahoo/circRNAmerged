@@ -229,10 +229,26 @@ plotTrack<-function(df, plotTranscript=T){
       
   }
   
-  symbol <- getSymbol(df)
-  if(length(unique(df$circRNA_ID)) > 200){
-    return('too many circRNA')
+  checkError<-function(df){
+    n_circRNA<-length(unique(df$circRNA_ID))
+    n_chr<-length(unique(df$chr))
+    if(n_circRNA > 200){
+      return(stop('too many circRNA to plot: ', n_circRNA))
+    }
+    if(n_chr != 1){
+      return(
+        stop('circRNA not in the same chromosome: ',
+             paste0(unique(df$chr), collapse = ', ') )
+             )
+    }
   }
+  
+  error <- checkError(df)
+  if(!is.null(error)){
+    return(error)
+  }
+  
+  symbol <- getSymbol(df)
   
   df %>%
     prepareArc %>%
