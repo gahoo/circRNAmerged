@@ -88,12 +88,12 @@ plotCircSets<-function(df, cnt=0, ...){
 
 
 
-plotRelExpPattern<-function(df, facet=T, significant2alpha=T, line=T){
+plotRelExpPattern<-function(df, facet=T, significant2alpha=T, line=T, p.value=0.05){
   df %>%
     select(ratio.Normal, ratio.Tumor, sample, circRNA_ID, p.values) %>%
     gather(type,ratio,ratio.Normal,ratio.Tumor) %>%
     mutate(type=gsub('ratio.','',type),
-           significant=p.values<=0.05,
+           significant=p.values<=p.value,
            log10P=log10(p.values) ) %>%
     left_join(addSymbolAnno(df)) %>%
     ggplot(aes(x=sample, y=ratio, group=type)) + 
@@ -102,19 +102,23 @@ plotRelExpPattern<-function(df, facet=T, significant2alpha=T, line=T){
     p
   
   if(significant2alpha&facet){
-    point_aes<-aes(size=-log10P, alpha=significant, color=type)
+    point_aes<-aes(size=-log10P, alpha=significant, color=type, shape=type)
+    line_aes<-aes(color=type)
     p <- p + facet_grid(anno~.)
   }else if(significant2alpha&!facet){
     point_aes<-aes(size=-log10P, alpha=significant, color=anno, shape=type)
+    line_aes<-aes(color=circRNA_ID, group=factor(paste0(circRNA_ID,type)))
   }else if(!significant2alpha&facet){
     point_aes<-aes(size=-log10P, color=type, shape=type)
+    line_aes<-aes(color=type)
     p <- p + facet_grid(anno~.)
   }else if(!significant2alpha&!facet){
-    point_aes<-aes(size=-log10P, color=anno)
+    point_aes<-aes(size=-log10P, color=anno, shape=type)
+    line_aes<-aes(color=circRNA_ID, group=factor(paste0(circRNA_ID,type)))
   }
   
   if(line){
-    p<-p + geom_line(aes(color=type))
+    p<-p + geom_line(line_aes)
   }
   
   p + geom_point(point_aes)

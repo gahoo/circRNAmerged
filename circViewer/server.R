@@ -186,7 +186,8 @@ shinyServer(function(input, output, session) {
       plotRelExpPattern(
         facet=input$ratio_pattern_facet,
         significant2alpha=input$ratio_pattern_map_significant,
-        line=input$ratio_pattern_line)
+        line=input$ratio_pattern_line,
+        p.value=input$ratio_pattern_p)
   })
   
   output$ratio_heatmap<-renderD3heatmap({
