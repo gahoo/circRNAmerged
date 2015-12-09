@@ -70,26 +70,57 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_rbind_rank<-reactive({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Calc Rank',
+                 detail = 'This may take a while...')
+    
     ciri_rbind() %>% rankCircRNA
   })
   
   ciri_merged<-reactive({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Building table',
+                 detail = 'This may take a while...')
+    
     ciri_rbind() %>%
       left_join(ciri_rbind_anno()) %>%
-      #left_join(ciri_rbind_rmsk()) %>%
+      left_join(ciri_rbind_rmsk()) %>%
       #left_join(ciri_rbind_db()) %>%
       left_join(ciri_rbind_rank())
   })
   
   ciri_merged_filter<-reactive({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Filtering table',
+                 detail = 'This may take a while...')
+    
     if(length(filtering[['criteria']])>0){
       ciri_merged() %>%
         filter_(.dots = filtering[['criteria']] )
     }else{
       ciri_merged()
     }
-    
   })
+  
+  output$downloadData <- downloadHandler(
+    filename = function() {
+      dir(input$ciri_path) %>%
+        gsub(pattern = '.CIRI.merged',
+             replacement = '') %>%
+        paste0(collapse = '_') ->
+        ciri_basename
+      paste(format(Sys.time(), "%Y-%b-%d_%X"), '.', ciri_basename, '.filtered.csv.gz', sep='')
+    },
+    content = function(con) {
+      gzip <- gzfile(con, "w")
+      ciri_merged_filter() %>%
+        write.csv(file=gzip, row.names=F)
+      close(gzip)
+    }
+  )
   
   output$ciri_datatable<-DT::renderDataTable({
     ciri_merged_filter() %>%
@@ -200,6 +231,11 @@ shinyServer(function(input, output, session) {
   })
   
   output$ratio_pattern<-renderPlot({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Ploting Relative Expression Ratio Pattern',
+                 detail = 'This may take a while...')
+    
     ciri_selected() %>%
       plotRelExpPattern(
         facet=input$ratio_pattern_facet,
@@ -251,6 +287,11 @@ shinyServer(function(input, output, session) {
   })
   
   output$arc_plot<-renderPlot({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Ploting Tracks',
+                 detail = 'This may take a while...')
+    
     ciri_selected() %>%
       plotTrack(
         plot.transcript = input$track_transcript,

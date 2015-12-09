@@ -46,6 +46,7 @@ shinyUI(fluidPage(
                                 actionButton('add_filter','Add'),
                                 actionButton('remove_filter','Remove'),
                                 actionButton('clear_filter','Clear'),
+                                downloadButton('downloadData', 'Download'),
                                 verbatimTextOutput('criteria')
                  ),
                  DT::dataTableOutput('ciri_datatable'),
