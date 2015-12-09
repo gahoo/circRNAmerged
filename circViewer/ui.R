@@ -3,6 +3,9 @@ library(DT)
 library(shinyAce)
 library(d3heatmap)
 
+preset_filter<-'p.values<0.05 & depth.Total > 10 & 
+(depth.Normal <=1 & depth.Tumor >= 5) &
+(depth.Normal >=5 & depth.Tumor <= 1)'
 inlineDiv<-function(...){div(style="display:inline-block", ...)}
 
 collapsibleDiv<-function(id, ..., label='Show/Hide', .func=actionButton,
@@ -43,7 +46,9 @@ shinyUI(fluidPage(
                                 class = 'btn-warning btn-xs pull-right',
                                 icon = icon('info-sign',lib='glyphicon'),
                                 inlineDiv(uiOutput('ciri_filtering_column')),
-                                inlineDiv(textInput('ciri_filter_string', '')),
+                                inlineDiv(textInput(
+                                  'ciri_filter_string', '',
+                                  preset_filter)),
                                 actionButton('add_filter','Add'),
                                 actionButton('remove_filter','Remove'),
                                 actionButton('clear_filter','Clear'),

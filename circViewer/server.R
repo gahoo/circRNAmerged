@@ -34,7 +34,10 @@ shinyServer(function(input, output, session) {
   ciri_rbind<-reactive({
     df<-do.call(rbind, ciri_list()) %>%
       mutate(length = circRNA_end - circRNA_start,
-             ratio.Diff=ratio.Tumor-ratio.Normal)
+             ratio.Diff = ratio.Tumor-ratio.Normal,
+             depth.Normal = junction.Normal + non_junction.Normal,
+             depth.Tumor = junction.Tumor + non_junction.Tumor,
+             depth.Total = depth.Normal + depth.Tumor)
   })
   
   ciri_rbind_gr<-reactive({
@@ -142,7 +145,7 @@ shinyServer(function(input, output, session) {
   output$ciri_filtering_column<-renderUI({
     selectInput('ciri_filtering_column', 'Filter',
                 choices = c('free', names(ciri_merged_filter())),
-                selected = 'circRNA_ID')
+                selected = 'free')
   })
   
   filtering<-reactiveValues(criteria=list())
