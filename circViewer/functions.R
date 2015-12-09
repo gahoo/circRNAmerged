@@ -22,16 +22,14 @@ datatable_template<-function(data, ...){
   )
 }
 
-loadCIRI<-function(ciri_files){
+loadCIRI<-function(ciri_files, nrow=-1){
   withProgress(message = 'Loading CIRI.merge files',
                detail = 'This may take a while...', value = 0, {
     n<-length(ciri_files)
     step_size<-1/n
     lapply(ciri_files, function(ciri_file){
       incProgress(step_size, detail=ciri_file)
-      read.table(ciri_file, sep='\t',header=T,
-                 nrow=10
-                 ) %>%
+      read.table(ciri_file, sep='\t',header=T,nrow=nrow) %>%
         mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
         data
       colnames(data)[11:16]<-c('junction.Normal', 'junction.Tumor',
