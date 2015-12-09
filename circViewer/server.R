@@ -234,7 +234,13 @@ shinyServer(function(input, output, session) {
   output$arc_plot<-renderPlot({
     ciri_selected() %>%
       plotTrack(
-        plotTranscript=input$track_transcript
+        plot.transcript = input$track_transcript,
+        plot.repeats = input$track_repeats,
+        extend_size = input$track_extend_size,
+        flank_only = input$track_repeats_flank_only,
+        repeat_column = input$track_repeats_column,
+        repeat.y = input$track_repeats_y,
+        repeat.fill = input$track_repeats_fill
         )
   })
   

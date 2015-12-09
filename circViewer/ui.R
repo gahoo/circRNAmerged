@@ -144,7 +144,20 @@ shinyUI(fluidPage(
                    label = 'arcControls',
                    class = 'btn-success btn-xs pull-right',
                    icon = icon('info-sign',lib='glyphicon'),
-                   checkboxInput('track_transcript', 'plot transcript', value=F)
+                   checkboxInput('track_transcript', 'plot transcript', value=F),
+                   checkboxInput('track_repeats', 'plot repeats', value=F),
+                   checkboxInput('track_repeats_flank_only', 'flank only', value=F),
+                   numericInput('track_extend_size', 'extend size for repeat:',
+                                value = '2000', min = 0, max = 100000),
+                   selectInput('track_repeats_y', 'repeat.y', 
+                               choices = c('name', 'class', 'family'),
+                               selected = 'name'),
+                   selectInput('track_repeats_column', 'repeat reverse complement by', 
+                               choices = c('name', 'class', 'family'),
+                               selected = 'name'),
+                   selectInput('track_repeats_fill', 'repeat reverse complement by', 
+                               choices = c('name', 'score', 'class', 'family', 'strand'),
+                               selected = 'strand')
                  ),
                  plotOutput('arc_plot', height='700px')
   )
