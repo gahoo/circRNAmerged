@@ -49,6 +49,7 @@ shinyUI(fluidPage(
                                 verbatimTextOutput('criteria')
                  ),
                  DT::dataTableOutput('ciri_datatable'),
+                 #actionButton('clear_selection','Clear Selection'),
                  collapsibleDiv(id='subsetting', collapse = T,
                                 label = 'subsetting',
                                 class = 'btn-success btn-xs pull-right',

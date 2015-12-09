@@ -86,6 +86,12 @@ shinyServer(function(input, output, session) {
       datatable(filter='top', options=list(stateSave = TRUE) )
   })
   
+#   proxy = DT::dataTableProxy('ciri_datatable')
+#   
+#   observeEvent(input$clear_selection,{
+#     selectColumns(proxy, NULL)
+#   })
+  
   ciri_column_class<-reactive({
     ciri_merged() %>%
       sapply(class) %>%
