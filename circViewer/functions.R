@@ -126,7 +126,7 @@ plotRelExpPattern<-function(df, facet=T, significant2alpha=T, line=T, p.value=0.
   p + geom_point(point_aes)
 }
 
-prepareHeatmapRatio<-function(df, diff=F, color_fix=T){
+prepareHeatmapRatio<-function(df, diff=F, color_fix=T, rownames_fix=T){
   getRatioDf<-function(df){
     df %>%
       select(circRNA_ID, sample, ratio.Normal, ratio.Tumor) %>%
@@ -142,7 +142,10 @@ prepareHeatmapRatio<-function(df, diff=F, color_fix=T){
       spread(sample, ratio.Diff, fill=0)
   }
   
-  anno<-addSymbolAnno(df) %>% mutate(anno=gsub('\n','\t',anno))
+  anno<-addSymbolAnno(df)
+  if(rownames_fix){
+    anno <- anno %>% mutate(anno=gsub('\n','\t',anno))
+  }
   
   if(diff){
     df <- getRatioDiff(df) 
