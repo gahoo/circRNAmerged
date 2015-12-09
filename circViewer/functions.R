@@ -9,20 +9,13 @@ load('rmsk.family.RData')
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 data(genesymbol, package = "biovizBase")
 
-progressTip<-function(session, message='Processing', detail='This may take a while...'){
-  progress <- shiny::Progress$new(session)
-  on.exit(progress$close())
-  progress$set(message = message,
-               detail = detail)
-}
-
 datatable_template<-function(data, ...){
   datatable(data, filter='top',
             extensions = c('TableTools','ColReorder','ColVis'),
             options=list(
               pageLength = 10,
               stateSave = FALSE,
-              dom = 'CR<"clear">lfrtip',
+              dom = 'CRT<"clear">lfrtip',
               tableTools = list(sSwfPath = copySWF())
             ),
             ...
@@ -34,10 +27,10 @@ loadCIRI<-function(ciri_files){
                detail = 'This may take a while...', value = 0, {
     n<-length(ciri_files)
     step_size<-1/n
-    lapply(ciri_files, function(ciri_file){
+    lapply(ciri_files[1:3], function(ciri_file){
       incProgress(step_size, detail=ciri_file)
       read.table(ciri_file, sep='\t',header=T,
-                 nrow=1000
+                 nrow=10
                  ) %>%
         mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
         data
