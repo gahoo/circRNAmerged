@@ -26,15 +26,9 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_list<-reactive({
-    if(length(filtering[['criteria']])==0){
-      #preview
-      nrow=100
-    }else{
-      nrow=-1
-    }
     ciri_files<-dir(input$ciri_path)
     paste(input$ciri_path,ciri_files,sep='/') %>%
-      loadCIRI(nrow=nrow)
+      loadCIRI(nrow=input$preview_nrow)
   })
   
   ciri_rbind<-reactive({

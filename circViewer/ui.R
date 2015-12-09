@@ -45,6 +45,8 @@ shinyUI(fluidPage(
                                 label = 'filters',
                                 class = 'btn-warning btn-xs pull-right',
                                 icon = icon('info-sign',lib='glyphicon'),
+                                numericInput('preview_nrow', 'preview rows:',
+                                             min = -1, max = 2000, value=10),
                                 inlineDiv(uiOutput('ciri_filtering_column')),
                                 inlineDiv(textInput(
                                   'ciri_filter_string', '',
