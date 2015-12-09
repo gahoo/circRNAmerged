@@ -42,6 +42,8 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_rbind_anno<-reactive({
+    progressTip(message='Annotate Genes')
+    
     annotateGene(ciri_rbind_gr(), GeneRanges)
   })
   

@@ -9,6 +9,13 @@ data(genesymbol, package = "biovizBase")
 load('rmsk_0.0.1.RData')
 load('rmsk.family.RData')
 
+progressTip<-function(session, message='Processing', detail='This may take a while...'){
+  progress <- shiny::Progress$new(session)
+  on.exit(progress$close())
+  progress$set(message = message,
+               detail = detail)
+}
+
 datatable_template<-function(data, ...){
   datatable(data, filter='top',
             extensions = c('TableTools','FixedHeader','ColReorder','ColVis'),
@@ -30,7 +37,7 @@ loadCIRI<-function(ciri_files){
     lapply(ciri_files, function(ciri_file){
       incProgress(step_size, detail=ciri_file)
       read.table(ciri_file, sep='\t',header=T,
-                 nrow=10
+                 nrow=10000
                  ) %>%
         mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
         data
