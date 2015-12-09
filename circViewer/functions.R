@@ -9,6 +9,19 @@ data(genesymbol, package = "biovizBase")
 load('rmsk_0.0.1.RData')
 load('rmsk.family.RData')
 
+datatable_template<-function(data, ...){
+  datatable(data, filter='top',
+            extensions = c('TableTools','FixedHeader','ColReorder','ColVis'),
+            options=list(
+              pageLength = 10,
+              stateSave = FALSE,
+              dom = 'CRT<"clear">lfrtip',
+              tableTools = list(sSwfPath = copySWF())
+            ),
+            ...
+  )
+}
+
 loadCIRI<-function(ciri_files){
   withProgress(message = 'Loading CIRI.merge files',
                detail = 'This may take a while...', value = 0, {
@@ -17,7 +30,7 @@ loadCIRI<-function(ciri_files){
     lapply(ciri_files, function(ciri_file){
       incProgress(step_size, detail=ciri_file)
       read.table(ciri_file, sep='\t',header=T,
-                 nrow=100
+                 nrow=10
                  ) %>%
         mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
         data
