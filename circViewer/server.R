@@ -11,8 +11,6 @@ library(RColorBrewer)
 
 source('functions.R')
 GeneRanges<-loadGeneRanges()
-load('rmsk_0.0.1.RData')
-load('rmsk.family.RData')
 c('circRNA_ID', 'sample', 'X.junction_reads', 'SM_MS_SMS', 'X.non_junction_reads', 
   'junction_reads_ratio', 'junction.Normal', 'junction.Tumor',
   'non_junction.Normal', 'non_junction.Tumor', 'ratio.Normal',

@@ -6,6 +6,8 @@ library(tidyr)
 
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 data(genesymbol, package = "biovizBase")
+load('rmsk_0.0.1.RData')
+load('rmsk.family.RData')
 
 loadCIRI<-function(ciri_files){
   withProgress(message = 'Loading CIRI.merge files',
@@ -321,6 +323,8 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
       plotRepeat(repeat.y=repeat.y,
                  repeat.fill) ->
       repeats
+  }else{
+    repeats <- NULL
   }
   
   if(plot.transcript & length(symbol) > 0 ){
