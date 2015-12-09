@@ -215,29 +215,55 @@ fixSymbol<-function(df){
     )
 }
 
-prepareRepeat<-function(df, extend_size=0, flank_only=F, column_name='repeat.name'){
-  df %>%
-    df2GRanges ->
-    which
-  which %>%
-    annotateRmsk %>%
-    "[["(column_name) %>%
-    strsplit(split=',') %>%
-    unlist %>%
-    unique ->
-    duplicated_names
+prepareRepeat<-function(df, extend_size=0, flank_only=F,
+                        reverse_complement_only=T, 
+                        column_name='repeat.name'){
+  df2extendRanges<- function(df){
+    if(flank_only){
+      change_range<-flank_both
+    }else{
+      change_range<-extend
+    }
+    
+    df %>%
+      df2GRanges %>%
+      change_range(extend_size)->
+      which
+  }
   
+  reverseComplementFilter<-function(repeats){
+    repeats %>%
+      as.data.frame %>%
+      select_('strand', column_name) %>%
+      unique %>%
+      "[["(column_name) ->
+      candidates
+    rev_comp_name<-candidates[duplicated(candidates)]
+    
+    mcols(repeats) %>%
+      "[["(column_name) %>%
+      "%in%"(rev_comp_name) ->
+      rev_comp_idx
+    
+    repeats[rev_comp_idx]
+  }
+  
+  which <- df2extendRanges(df)
   repeats <- subsetByOverlaps(rmsk, which, ignore.strand=T)
   mcols(repeats) %>%
     as.data.frame %>%
-    left_join(rmsk.family) %>%
-    "[["(gsub("repeat.","",column_name)) %>%
-    "%in%"(duplicated_names) ->
-    dup_idx
-  repeats[dup_idx]
+    left_join(rmsk.family) ->
+    mcols(repeats)
+  
+  if(reverse_complement_only){
+    reverseComplementFilter(repeats)
+  }else{
+    repeats
+  }
+  
 }
 
-plotTrack<-function(df, plotTranscript=T){
+plotTrack<-function(df, plotTranscript=T, plotRepeats=T, extend_size=0, flank_only=F){
   
   getSymbol<-function(df){
     df %>%
@@ -272,10 +298,20 @@ plotTrack<-function(df, plotTranscript=T){
   
   symbol <- getSymbol(df)
   
-  df %>%
-    prepareArc %>%
-    plotArc ->
-    arc
+  arcGranges <- prepareArc(df)
+  arc <- plotArc(arcGranges)
+  
+  if(plotRepeats){
+    if(flank_only){
+      func<-flank_both
+    }else{
+      func<-extend
+    }
+    arcGranges %>%
+      func(extend_size) %>%
+      prepareRepeat ->
+      repeatGranges
+  }
   
   if(plotTranscript & length(symbol) > 0 ){
     which_gene<-genesymbol[symbol]
