@@ -27,7 +27,7 @@ loadCIRI<-function(ciri_files){
                detail = 'This may take a while...', value = 0, {
     n<-length(ciri_files)
     step_size<-1/n
-    lapply(ciri_files[1:3], function(ciri_file){
+    lapply(ciri_files, function(ciri_file){
       incProgress(step_size, detail=ciri_file)
       read.table(ciri_file, sep='\t',header=T,
                  nrow=10
@@ -60,6 +60,12 @@ plotSampleSets<-function(df, ...){
           decreasing=c(T,F),
           ...
     )
+}
+
+plotVolcano<-function(df){
+  df %>%
+    ggplot(aes(x=ratio.Diff, y=-log10(p.values)))+
+    geom_point()
 }
 
 filterCnt<-function(df, cnt){
