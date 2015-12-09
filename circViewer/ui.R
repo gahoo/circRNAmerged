@@ -135,7 +135,7 @@ shinyUI(fluidPage(
                             )
                    )
   ),
-  collapsibleDiv(id='selected_rows_arc', collapse = F,
+  collapsibleDiv(id='selected_rows_arc', collapse = T,
                  label = 'arcPlot',
                  class = 'btn-info btn-xs',
                  collapsibleDiv(

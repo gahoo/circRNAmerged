@@ -37,9 +37,6 @@ shinyServer(function(input, output, session) {
              ratio.Diff=ratio.Tumor-ratio.Normal)
   })
   
-  #ciri_rbind_filter? could speed up table rebuild when data is large or changing extend_size
-  #ui could use dynamic ui with add remove filter by column class
-  
   ciri_rbind_gr<-reactive({
     ciri_rbind() %>% df2GRanges
   })
@@ -82,7 +79,7 @@ shinyServer(function(input, output, session) {
   
   output$ciri_datatable<-DT::renderDataTable({
     ciri_merged() %>%
-      datatable(filter='top', options=list(stateSave = TRUE) )
+      datatable_template
   })
   
 #   proxy = DT::dataTableProxy('ciri_datatable')
@@ -164,7 +161,7 @@ shinyServer(function(input, output, session) {
   
   output$rows_circRNA_table<-DT::renderDataTable({
     selected_rows_circRNA() %>%
-      datatable(escape = F)
+      datatable_template(escape = F)
   })
   
   selected_rows_samples<-reactive({
@@ -175,7 +172,7 @@ shinyServer(function(input, output, session) {
   
   output$rows_sample_table<-DT::renderDataTable({
     selected_rows_samples() %>%
-      datatable
+      datatable_template
   })
   
   output$upset_samples<-renderPlot({
