@@ -9,13 +9,13 @@ library(d3heatmap)
 library(pheatmap)
 library(RColorBrewer)
 
-
 source('functions.R')
 GeneRanges<-loadGeneRanges()
+
 c('circRNA_ID', 'sample', 'X.junction_reads', 'SM_MS_SMS', 'X.non_junction_reads', 
   'junction_reads_ratio', 'junction.Normal', 'junction.Tumor',
   'non_junction.Normal', 'non_junction.Tumor', 'ratio.Normal',
-  'ratio.Tumor', 'p.values', 'fdr') ->
+  'ratio.Tumor', 'ratio.Diff', 'p.values', 'fdr') ->
   sample_columns
 
 shinyServer(function(input, output, session) {
@@ -42,7 +42,10 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_rbind_anno<-reactive({
-    progressTip(message='Annotate Genes')
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Annotate Genes',
+                 detail = 'This may take a while...')
     
     annotateGene(ciri_rbind_gr(), GeneRanges)
   })
@@ -75,12 +78,21 @@ shinyServer(function(input, output, session) {
       left_join(ciri_rbind_anno()) %>%
       #left_join(ciri_rbind_rmsk()) %>%
       #left_join(ciri_rbind_db()) %>%
-      left_join(ciri_rbind_rank()) %>%
-      filter_(.dots = filtering[['criteria']] )
+      left_join(ciri_rbind_rank())
+  })
+  
+  ciri_merged_filter<-reactive({
+    if(length(filtering[['criteria']])>0){
+      ciri_merged() %>%
+        filter_(.dots = filtering[['criteria']] )
+    }else{
+      ciri_merged()
+    }
+    
   })
   
   output$ciri_datatable<-DT::renderDataTable({
-    ciri_merged() %>%
+    ciri_merged_filter() %>%
       datatable_template
   })
   
@@ -91,14 +103,14 @@ shinyServer(function(input, output, session) {
 #   })
   
   ciri_column_class<-reactive({
-    ciri_merged() %>%
+    ciri_merged_filter() %>%
       sapply(class) %>%
       as.list
   })
   
   output$ciri_filtering_column<-renderUI({
     selectInput('ciri_filtering_column', 'Filter',
-                choices = c('free', names(ciri_merged())),
+                choices = c('free', names(ciri_merged_filter())),
                 selected = 'circRNA_ID')
   })
   
@@ -133,19 +145,19 @@ shinyServer(function(input, output, session) {
     }
     
     if(input$subsettingBy=='none'){
-      ciri_merged()
+      ciri_merged_filter()
     }else{
       if(is.null(row_id)){
         row_id<-1
       }
       
-      selected<-ciri_merged()[row_id,] %>% fixSymbol
+      selected<-ciri_merged_filter()[row_id,] %>% fixSymbol
       
       columnName<-input$showBy
       filterValues<-unique(selected[[columnName]])
       filter_criteria <- interp(~ columnName %in% filterValues,
                                 columnName=as.name(columnName))
-      ciri_merged() %>%
+      ciri_merged_filter() %>%
         fixSymbol %>%
         filter_(filter_criteria)
     }
