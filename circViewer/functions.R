@@ -367,6 +367,14 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
   tracks(track_list, title=track_title, heights=track_height[names(track_list)])
 }
 
+plotAllFig<-function(ids, df, type='circRNA_ID', args=list()){
+  for(id in ids){
+    for(plot_name in names(args)){
+      p<-do.call(plot_name, args=args[[plot_name]])
+      print(p)
+    }
+  }
+}
 
 df2GRanges<-function(df){
   df %>%
