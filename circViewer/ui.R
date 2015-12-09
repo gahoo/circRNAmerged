@@ -1,5 +1,6 @@
 library(shiny)
 library(DT)
+library(shinyAce)
 library(d3heatmap)
 
 inlineDiv<-function(...){div(style="display:inline-block", ...)}
@@ -46,7 +47,7 @@ shinyUI(fluidPage(
                                 actionButton('add_filter','Add'),
                                 actionButton('remove_filter','Remove'),
                                 actionButton('clear_filter','Clear'),
-                                downloadButton('downloadData', 'Download'),
+                                downloadButton('downloadTableData', 'Download'),
                                 verbatimTextOutput('criteria')
                  ),
                  DT::dataTableOutput('ciri_datatable'),
@@ -160,5 +161,14 @@ shinyUI(fluidPage(
                                selected = 'strand')
                  ),
                  plotOutput('arc_plot', height='700px')
+  ),
+  collapsibleDiv(id='batch_mode', collapse = T,
+                 label = 'batchMode',
+                 class = 'btn-info btn-xs',
+                 checkboxInput('batch_relExpPattern', 'Relative Expression Pattern', T),
+                 checkboxInput('batch_heatmap', 'heatmap', T),
+                 checkboxInput('batch_arcPlot', 'arc plot', T),
+                 aceEditor("batch_ids", mode='txt', value="", height="200px"),
+                 downloadButton('downloadPlotData', 'Download PDF')
   )
 ))

@@ -105,7 +105,7 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  output$downloadData <- downloadHandler(
+  output$downloadTableData <- downloadHandler(
     filename = function() {
       dir(input$ciri_path) %>%
         gsub(pattern = '.CIRI.merged',
@@ -303,6 +303,24 @@ shinyServer(function(input, output, session) {
         repeat.fill = input$track_repeats_fill
         )
   })
+  
+  output$downloadPlotData <- downloadHandler(
+    filename = function() {
+      dir(input$ciri_path) %>%
+        gsub(pattern = '.CIRI.merged',
+             replacement = '') %>%
+        paste0(collapse = '_') ->
+        ciri_basename
+      paste(format(Sys.time(), "%Y-%b-%d_%X"), '.', ciri_basename, '.pdf', sep='')
+    },
+    content = function(con) {
+      pdf(con)
+      input$batch_ids %>%
+        strsplit(split='\n') ->
+        ids
+      plotAllFig(ids, ciri_merged_filter())
+      dev.off()
+    })
   
   output$helper<-renderText({
     #str(input$ciri_datatable_rows_all)
