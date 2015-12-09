@@ -4,10 +4,10 @@ library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(dplyr)
 library(tidyr)
 
-txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
-data(genesymbol, package = "biovizBase")
 load('rmsk_0.0.1.RData')
 load('rmsk.family.RData')
+txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
+data(genesymbol, package = "biovizBase")
 
 progressTip<-function(session, message='Processing', detail='This may take a while...'){
   progress <- shiny::Progress$new(session)
@@ -18,11 +18,11 @@ progressTip<-function(session, message='Processing', detail='This may take a whi
 
 datatable_template<-function(data, ...){
   datatable(data, filter='top',
-            extensions = c('TableTools','FixedHeader','ColReorder','ColVis'),
+            extensions = c('TableTools','ColReorder','ColVis'),
             options=list(
               pageLength = 10,
               stateSave = FALSE,
-              dom = 'CRT<"clear">lfrtip',
+              dom = 'CR<"clear">lfrtip',
               tableTools = list(sSwfPath = copySWF())
             ),
             ...
@@ -37,7 +37,7 @@ loadCIRI<-function(ciri_files){
     lapply(ciri_files, function(ciri_file){
       incProgress(step_size, detail=ciri_file)
       read.table(ciri_file, sep='\t',header=T,
-                 nrow=10000
+                 nrow=1000
                  ) %>%
         mutate(sample=gsub('.*/','',gsub('.CIRI.merged','',ciri_file))) ->
         data
@@ -312,8 +312,11 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
       "$"("symbol") %>%
       strsplit(split=',') %>%
       unlist %>%
-      unique
-    
+      unique ->
+      symbol
+    symbol <- symbol[!is.na(symbol)]
+    idx<-symbol %in% genesymbol$symbol
+    symbol[idx]
   }
   
   checkError<-function(df){
@@ -336,7 +339,6 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
   }
   
   symbol <- getSymbol(df)
-  symbol <- symbol[!is.na(symbol)]
   
   df %>% prepareArc %>% plotArc -> arc
   
