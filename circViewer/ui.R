@@ -67,6 +67,7 @@ shinyUI(fluidPage(
                                 selectInput('showBy', 'show by:',
                                             choices = c('circRNA_ID', 'symbol'),
                                             selected='circRNA_ID'),
+                                checkboxInput('filter_only', 'use filtered data', value = T),
                                 checkboxInput('col2row', 'colums 2 rows', value = F)
                  )
   ),

@@ -26,9 +26,15 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_list<-reactive({
+    if(length(filtering[['criteria']])==0){
+      #preview
+      nrow=100
+    }else{
+      nrow=-1
+    }
     ciri_files<-dir(input$ciri_path)
     paste(input$ciri_path,ciri_files,sep='/') %>%
-      loadCIRI
+      loadCIRI(nrow=nrow)
   })
   
   ciri_rbind<-reactive({
@@ -185,15 +191,22 @@ shinyServer(function(input, output, session) {
         row_id<-1
       }
       
-      selected<-ciri_merged_filter()[row_id,] %>% fixSymbol
+      if(filter_only){
+        # fix:make it a function
+        selected<-ciri_merged_filter()[row_id,] %>% fixSymbol
+        
+        columnName<-input$showBy
+        filterValues<-unique(selected[[columnName]])
+        filter_criteria <- interp(~ columnName %in% filterValues,
+                                  columnName=as.name(columnName))
+        
+        ciri_merged_filter() %>%
+          fixSymbol %>%
+          filter_(filter_criteria)
+      }else{
+        ciri_merged
+      }
       
-      columnName<-input$showBy
-      filterValues<-unique(selected[[columnName]])
-      filter_criteria <- interp(~ columnName %in% filterValues,
-                                columnName=as.name(columnName))
-      ciri_merged_filter() %>%
-        fixSymbol %>%
-        filter_(filter_criteria)
     }
   })
   
