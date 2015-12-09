@@ -217,7 +217,7 @@ fixSymbol<-function(df){
 
 prepareRepeat<-function(df, extend_size=0, flank_only=F,
                         reverse_complement_only=T, 
-                        column_name='repeat.name'){
+                        repeat_column='name'){
   df2extendRanges<- function(df){
     if(flank_only){
       change_range<-flank_both
@@ -234,14 +234,14 @@ prepareRepeat<-function(df, extend_size=0, flank_only=F,
   reverseComplementFilter<-function(repeats){
     repeats %>%
       as.data.frame %>%
-      select_('strand', column_name) %>%
+      select_('strand', repeat_column) %>%
       unique %>%
-      "[["(column_name) ->
+      "[["(repeat_column) ->
       candidates
     rev_comp_name<-candidates[duplicated(candidates)]
     
     mcols(repeats) %>%
-      "[["(column_name) %>%
+      "[["(repeat_column) %>%
       "%in%"(rev_comp_name) ->
       rev_comp_idx
     
@@ -263,7 +263,21 @@ prepareRepeat<-function(df, extend_size=0, flank_only=F,
   
 }
 
-plotTrack<-function(df, plotTranscript=T, plotRepeats=T, extend_size=0, flank_only=F){
+plotRepeat<-function(repeatGranges, repeat.y, repeat.fill = 'strand'){
+  mcols(repeatGranges)[[repeat.y]]<-as.character(mcols(repeatGranges)[[repeat.y]])
+  if(length(repeatGranges)!=0){
+    ggbio() + 
+      geom_alignment(data = repeatGranges,
+                     aes_string(group = repeat.y, fill = repeat.fill),
+                     alpha = 0.7,
+                     label = T)
+  }else{
+    NULL
+  }
+}
+
+plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
+                    repeat.y=repeat_column, repeat.fill = 'strand'){
   
   getSymbol<-function(df){
     df %>%
@@ -274,7 +288,7 @@ plotTrack<-function(df, plotTranscript=T, plotRepeats=T, extend_size=0, flank_on
       strsplit(split=',') %>%
       unlist %>%
       unique
-      
+    
   }
   
   checkError<-function(df){
@@ -287,7 +301,7 @@ plotTrack<-function(df, plotTranscript=T, plotRepeats=T, extend_size=0, flank_on
       return(
         stop('circRNA not in the same chromosome: ',
              paste0(unique(df$chr), collapse = ', ') )
-             )
+      )
     }
   }
   
@@ -298,40 +312,37 @@ plotTrack<-function(df, plotTranscript=T, plotRepeats=T, extend_size=0, flank_on
   
   symbol <- getSymbol(df)
   
-  arcGranges <- prepareArc(df)
-  arc <- plotArc(arcGranges)
+  df %>% prepareArc %>% plotArc -> arc
   
-  if(plotRepeats){
-    if(flank_only){
-      func<-flank_both
-    }else{
-      func<-extend
-    }
-    arcGranges %>%
-      func(extend_size) %>%
-      prepareRepeat ->
-      repeatGranges
+  if(plot.repeats){
+    df %>%
+      prepareRepeat(...) %>%
+      plotRepeat(repeat.y=repeat.y,
+                 repeat.fill) ->
+      repeats
   }
   
-  if(plotTranscript & length(symbol) > 0 ){
+  if(plot.transcript & length(symbol) > 0 ){
     which_gene<-genesymbol[symbol]
-    transcripts <- ggbio() + geom_alignment(data=txdb, which = which_gene )
-    track_height <- c(3,1)
+    transcripts <- ggbio() + 
+      geom_alignment(data=txdb, which = which_gene)    
     track_title <- paste0(symbol, collapse = "|")
   }else{
     transcripts <- NULL
-    track_height <- 1
     track_title <- paste0(unique(df$circRNA_ID), collapse = "; ")
   }
   
   track_list<-list(
     arc=arc,
+    repeats=repeats,
     transcripts=transcripts
   )
   
+  track_height<-c(arc=6, repeats=2, transcripts=2)
   track_list<-track_list[!sapply(track_list, is.null)]
-  tracks(track_list, title=track_title, heights = track_height)
+  tracks(track_list, title=track_title, heights=track_height[names(track_list)])
 }
+
 
 df2GRanges<-function(df){
   df %>%
