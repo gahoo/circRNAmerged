@@ -122,18 +122,16 @@ shinyUI(fluidPage(
                            ),
                    column(
                      6,
-                     numericInput('heatmap2_width', 'circRNA_ID label width',
-                                  value = 25, min=5, max=50),
-                     numericInput('heatmap2_height', 'sample label height',
-                                  value = 12, min=5, max=50)
-                            )
+                     checkboxInput('pheatmap_cluster_cols', 'cluster columns', value = F),
+                     checkboxInput('pheatmap_cluster_rows', 'cluster rows', value = F)
+                          )
                  ),
                  tabsetPanel(
                    tabPanel('d3heatmap',
-                            d3heatmapOutput('ratio_heatmap', height='700px')
+                            d3heatmapOutput('ratio_d3heatmap', height='700px')
                             ),
-                   tabPanel('heatmap.2',
-                            plotOutput('ratio_heatmap2', height="700px")
+                   tabPanel('pheatmap',
+                            plotOutput('ratio_pheatmap', height="700px")
                             )
                    )
   ),

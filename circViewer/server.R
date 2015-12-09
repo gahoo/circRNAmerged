@@ -6,6 +6,7 @@ library(org.Hs.eg.db)
 library(dplyr)
 library(lazyeval)
 library(d3heatmap)
+library(pheatmap)
 library(RColorBrewer)
 
 
@@ -196,7 +197,7 @@ shinyServer(function(input, output, session) {
         p.value=input$ratio_pattern_p)
   })
   
-  output$ratio_heatmap<-renderD3heatmap({
+  output$ratio_d3heatmap<-renderD3heatmap({
     if(input$diff_ratio){
       colors_scheme = rev(brewer.pal(3,"RdYlGn"))
     }else{
@@ -204,7 +205,7 @@ shinyServer(function(input, output, session) {
     }
     
     ciri_selected() %>%
-      prepareHeatmapRatio(diff=input$diff_ratio, color_fix=T) %>%
+      prepareHeatmapRatio(diff=input$diff_ratio, color_fix=T, rownames_fix=T) %>%
       d3heatmap(colors = colors_scheme,
                 dendrogram = input$d3heatmap_dendrogram,
                 scale = input$d3heatmap_scale,
@@ -212,27 +213,30 @@ shinyServer(function(input, output, session) {
                 xaxis_height=150, yaxis_width=350)
   })
   
-  output$ratio_heatmap2<-renderPlot({
+  output$ratio_pheatmap<-renderPlot({
     if(input$diff_ratio){
-      colors_scheme = function(n){colorpanel(n, "green", "yellow", "red")}
+      colors_scheme = colorRampPalette(c("green", "yellow", "red"))(41)
+      breaks = seq(-1,1,by = 0.05)
       isSymbreaks <- T
     }else{
-      colors_scheme = function(n){colorpanel(n, "white", "blue")}
+      colors_scheme = colorRampPalette(c("white", "blue"))(21)
+      breaks = seq(0,1,by = 0.05)
       isSymbreaks <- F
     }
     
     ciri_selected() %>%
       prepareHeatmapRatio(
         diff=input$diff_ratio,
-        color_fix=F) %>%
+        color_fix=F,
+        rownames_fix=F) %>%
       as.matrix %>%
-      heatmap.2(col = colors_scheme,
-                symbreaks = isSymbreaks,
-                dendrogram = input$d3heatmap_dendrogram,
-                scale = input$d3heatmap_scale,
-                symm = input$d3heatmap_symm,
-                margins = c(input$heatmap2_height, input$heatmap2_width),
-                trace = 'none')
+      pheatmap(
+        color = colors_scheme,
+        breaks = breaks,
+        scale = input$d3heatmap_scale,
+        cluster_rows = input$pheatmap_cluster_rows,
+        cluster_cols = input$pheatmap_cluster_cols
+        )
   })
   
   output$arc_plot<-renderPlot({
