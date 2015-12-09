@@ -155,7 +155,7 @@ shinyUI(fluidPage(
                    selectInput('track_repeats_column', 'repeat reverse complement by', 
                                choices = c('name', 'class', 'family'),
                                selected = 'name'),
-                   selectInput('track_repeats_fill', 'repeat reverse complement by', 
+                   selectInput('track_repeats_fill', 'repeat fill color by', 
                                choices = c('name', 'score', 'class', 'family', 'strand'),
                                selected = 'strand')
                  ),
