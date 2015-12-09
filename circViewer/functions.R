@@ -311,6 +311,7 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
   }
   
   symbol <- getSymbol(df)
+  symbol <- symbol[!is.na(symbol)]
   
   df %>% prepareArc %>% plotArc -> arc
   
@@ -323,6 +324,7 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
   }
   
   if(plot.transcript & length(symbol) > 0 ){
+    str(symbol)
     which_gene<-genesymbol[symbol]
     transcripts <- ggbio() + 
       geom_alignment(data=txdb, which = which_gene)    
