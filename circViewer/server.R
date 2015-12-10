@@ -10,7 +10,6 @@ library(pheatmap)
 library(RColorBrewer)
 
 source('functions.R')
-GeneRanges<-loadGeneRanges()
 
 c('circRNA_ID', 'sample', 'X.junction_reads', 'SM_MS_SMS', 'X.non_junction_reads', 
   'junction_reads_ratio', 'junction.Normal', 'junction.Tumor',
@@ -168,6 +167,8 @@ shinyServer(function(input, output, session) {
   })
   
   output$criteria<-renderText({
+    #update after reload
+    input$preview_nrow
     filtering[['criteria']] %>% paste(collapse = ', ')
   })
   
