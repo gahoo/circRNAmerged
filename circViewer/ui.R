@@ -25,6 +25,21 @@ collapsibleDiv<-function(id, ..., label='Show/Hide', .func=actionButton,
   )
 }
 
+absoluteCollaspablePanel<-function(
+  ..., draggable=T, fixed=F, left=NULL, right=NULL, top=NULL, bottom=NULL){
+  absolutePanel(
+    collapsibleDiv(...), fixed=fixed,
+    draggable=draggable, left=left, right=right, top=top, bottom=bottom)
+}
+
+fixedCollaspablePanel<-function(
+  ..., draggable=T, fixed=T, left=NULL, right=5, top=10, bottom=NULL,
+  style='background: rgba(255, 255, 255, 0.6);'){
+  fixedPanel(
+    collapsibleDiv(..., style=style),
+    draggable=draggable, left=left, right=right, top=top, bottom=bottom)
+}
+
 shinyUI(fluidPage(
   titlePanel("circRNA Viewer"),
   textOutput('helper'),
@@ -38,27 +53,45 @@ shinyUI(fluidPage(
   collapsibleDiv(id='ciri_table', collapse = F,
                  label = 'CIRI',
                  class = 'btn-info btn-xs',
-                 collapsibleDiv(id='filters', collapse = T,
-                                label = 'filters',
-                                class = 'btn-warning btn-xs pull-right',
-                                icon = icon('info-sign',lib='glyphicon'),
-                                numericInput('preview_nrow', 'preview rows:',
-                                             min = -1, max = 1/0, value=10),
-                                checkboxInput('anno_repeat', 'annotate repeat', value = F),
-                                numericInput('extend_size', 'extend size for repeat annotation:',
-                                             value = '2000', min = 0, max = 100000),
-                                inlineDiv(uiOutput('ciri_filtering_column')),
-                                inlineDiv(textInput(
-                                  'ciri_filter_string', '',
-                                  preset_filter)),
-                                actionButton('add_filter','Add'),
-                                actionButton('remove_filter','Remove'),
-                                actionButton('clear_filter','Clear'),
-                                downloadButton('downloadTableData', 'Download'),
-                                verbatimTextOutput('criteria')
-                 ),
-                 DT::dataTableOutput('ciri_datatable')
-                 #actionButton('clear_selection','Clear Selection'),
+                 DT::dataTableOutput('ciri_datatable'),
+                 fixedPanel(
+                   draggable=T, top=40, right=5,
+                   collapsibleDiv(
+                     id='filters', collapse = T,
+                     label = 'filters',
+                     class = 'btn-warning btn-xs pull-right',
+                     style='background: rgba(255, 255, 255, 0.9);',
+                     icon = icon('info-sign',lib='glyphicon'),
+                     numericInput('preview_nrow', 'preview rows:',
+                                  min = -1, max = 1/0, value=10),
+                     checkboxInput('anno_repeat', 'annotate repeat', value = F),
+                     numericInput('extend_size', 'extend size for repeat annotation:',
+                                  value = '2000', min = 0, max = 100000),
+                     inlineDiv(uiOutput('ciri_filtering_column')),
+                     inlineDiv(textInput('ciri_filter_string', '', preset_filter)),
+                     actionButton('add_filter','Add'),
+                     actionButton('remove_filter','Remove'),
+                     actionButton('clear_filter','Clear'),
+                     downloadButton('downloadTableData', 'Download'),
+                     verbatimTextOutput('criteria')
+                   ),
+                   collapsibleDiv(
+                     id='subsetting', collapse = T,
+                     label = 'subsetting',
+                     class = 'btn-success btn-xs pull-right',
+                     style='background: rgba(255, 255, 255, 0.9);',
+                     icon = icon('info-sign',lib='glyphicon'),
+                     selectInput('subsettingBy', 'subsetting by:',
+                                 choices = c('rows', 'pages', 'none'),
+                                 selected = 'rows'),
+                     selectInput('showBy', 'show by:',
+                                 choices = c('circRNA_ID', 'symbol'),
+                                 selected='circRNA_ID'),
+                     checkboxInput('filter_only', 'filtered data only', value = T),
+                     checkboxInput('col2row', 'colums 2 rows', value = F)
+                     #actionButton('clear_selection','Clear Selection'),
+                   )
+                 )
   ),
   collapsibleDiv(id='selected_rows_summary_table', collapse = T,
                  label = 'summary',
@@ -75,10 +108,10 @@ shinyUI(fluidPage(
                  class = 'btn-info btn-xs',
                  DT::dataTableOutput('rows_sample_table')
   ),
-  collapsibleDiv(id='selected_rows_plot_table', collapse = F,
+  collapsibleDiv(id='selected_rows_plot_table', collapse = T,
                  label = 'tablePlot',
                  class = 'btn-info btn-xs',
-                 collapsibleDiv(
+                 fixedCollaspablePanel(
                    id='plot_table_controls', collapse = F,
                    label = 'plotTblControls',
                    class = 'btn-success btn-xs pull-right',
@@ -99,7 +132,7 @@ shinyUI(fluidPage(
   collapsibleDiv(id='selected_rows_ratio_pattern', collapse = T,
                  label = 'ratioPattern',
                  class = 'btn-info btn-xs',
-                 collapsibleDiv(id='pattern_controls', collapse = F,
+                 fixedCollaspablePanel(id='pattern_controls', collapse = F,
                                 label = 'ratioPatternControls',
                                 class = 'btn-success btn-xs pull-right',
                                 icon = icon('info-sign',lib='glyphicon'),
@@ -117,27 +150,23 @@ shinyUI(fluidPage(
   collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                  label = 'ratioHeatmap',
                  class = 'btn-info btn-xs',
-                 collapsibleDiv(
+                 fixedCollaspablePanel(
                    id='heatmap_controls', collapse = F,
                    label = 'heatmapControls',
                    class = 'btn-success btn-xs pull-right',
                    icon = icon('info-sign',lib='glyphicon'),
-                   column(
-                     6,
-                     checkboxInput('diff_ratio', 'Diff Ratio', value = F),
-                     checkboxInput('d3heatmap_symm', 'symm', value = F),
-                     selectInput('d3heatmap_dendrogram', 'dendrogram',
-                                 choices=c('none', 'row', 'column', 'both'),
-                                 selected='both'),
-                     selectInput('d3heatmap_scale', 'scale',
-                                 choices=c('none', 'row', 'column'),
-                                 selected='none')
-                           ),
-                   column(
-                     6,
-                     checkboxInput('pheatmap_cluster_cols', 'cluster columns', value = F),
-                     checkboxInput('pheatmap_cluster_rows', 'cluster rows', value = F)
-                          )
+                   checkboxInput('diff_ratio', 'Diff Ratio', value = F),
+                   checkboxInput('d3heatmap_symm', 'symm', value = F),
+                   selectInput('d3heatmap_dendrogram', 'dendrogram',
+                               choices=c('none', 'row', 'column', 'both'),
+                               selected='both'),
+                   selectInput('d3heatmap_scale', 'scale',
+                               choices=c('none', 'row', 'column'),
+                               selected='none'),
+                   checkboxInput('pheatmap_cluster_cols',
+                                 'cluster columns', value = F),
+                   checkboxInput('pheatmap_cluster_rows',
+                                 'cluster rows', value = F)
                  ),
                  tabsetPanel(
                    tabPanel('d3heatmap',
@@ -151,7 +180,7 @@ shinyUI(fluidPage(
   collapsibleDiv(id='selected_rows_arc', collapse = T,
                  label = 'arcPlot',
                  class = 'btn-info btn-xs',
-                 collapsibleDiv(
+                 fixedCollaspablePanel(
                    id='arc_controls', collapse = F,
                    label = 'arcControls',
                    class = 'btn-success btn-xs pull-right',
@@ -181,20 +210,5 @@ shinyUI(fluidPage(
                  checkboxInput('batch_arcPlot', 'arc plot', T),
                  aceEditor("batch_ids", mode='txt', value="", height="200px"),
                  downloadButton('downloadPlotData', 'Download PDF')
-  ),
-  fixedPanel(
-    collapsibleDiv(id='subsetting', collapse = T,
-                   label = 'subsetting',
-                   class = 'btn-success btn-xs pull-right',
-                   icon = icon('info-sign',lib='glyphicon'),
-                   selectInput('subsettingBy', 'subsetting by:',
-                               choices = c('rows', 'pages', 'none'),
-                               selected = 'rows'),
-                   selectInput('showBy', 'show by:',
-                               choices = c('circRNA_ID', 'symbol'),
-                               selected='circRNA_ID'),
-                   checkboxInput('filter_only', 'use filtered data only', value = T),
-                   checkboxInput('col2row', 'colums 2 rows', value = F)
-    ),
-    right = 20, top=20, draggable = TRUE)
+  )
 ))
