@@ -378,6 +378,18 @@ shinyServer(function(input, output, session) {
         facet=input$tbl_plot_facet)
   })
 
+  output$rows_summary_table<-DT::renderDataTable({
+    ciri_selected()%>%
+      summaryTblNumCols ->
+      dt
+    if(input$col2row){
+      row.names(dt)<-dt$sample
+      dt <- t(dt[,-1]) %>% as.data.frame
+    }
+    dt %>%
+      datatable
+  })
+
   output$helper<-renderText({
     #str(input$ciri_datatable_rows_all)
     #str(input$ciri_datatable_search_columns)

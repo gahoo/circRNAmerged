@@ -601,3 +601,28 @@ selectedFilter<-function(df, filterValues, columnName){
     fixSymbol %>%
     filter_(filter_criteria)
 }
+
+summaryTblNumCols<-function(df){
+  median.inf_rm<-function(x){median(x[!is.infinite(x)])}
+  mean.inf_rm<-function(x){mean(x[!is.infinite(x)])}
+  sd.inf_rm<-function(x){sd(x[!is.infinite(x)])}
+  
+  df %>%
+    group_by(sample) %>%
+    summarise_each(
+      funs(
+        min(.,na.rm=T),
+        median=median.inf_rm,
+        mean=mean.inf_rm,
+        max(.,na.rm=T),
+        sd=sd.inf_rm
+        ),
+      matches('ratio'),
+      matches('depth'),
+      matches('rank'),
+      matches('Normal'),
+      matches('Tumor'),
+      p.values, fdr) %>%
+    as.data.frame
+  
+}

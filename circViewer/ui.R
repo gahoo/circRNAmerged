@@ -73,6 +73,11 @@ shinyUI(fluidPage(
                                 checkboxInput('col2row', 'colums 2 rows', value = F)
                  )
   ),
+  collapsibleDiv(id='selected_rows_summary_table', collapse = T,
+                 label = 'summary',
+                 class = 'btn-info btn-xs',
+                 DT::dataTableOutput('rows_summary_table')
+  ),
   collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
                  label = 'circRNA',
                  class = 'btn-info btn-xs',
