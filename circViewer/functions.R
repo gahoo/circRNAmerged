@@ -61,11 +61,35 @@ plotSampleSets<-function(df, ...){
     )
 }
 
-plotVolcano<-function(df){
+plotTable<-function(df, x, y, log_x=F, log_y=F, flip=F, facet=NULL, func='geom_point', ...){
+  func.args<-list(
+    geom_point=list(),
+    geom_bar=list(stat='identity'),
+    geom_boxplot=list()
+    )
+  
   df %>%
-    ggplot(aes(x=ratio.Diff, y=-log10(p.values)))+
-    geom_point()
+    ggplot()+
+    do.call(aes_string, list(x=x, y=y, ...))+
+    do.call(func, args=func.args[[func]]) ->
+    p
+  
+  if(log_x){
+    p<-p+scale_x_log10()
+  }
+  if(log_y){
+    p<-p+scale_y_log10()
+  }
+  if(flip){
+    p<-p+coord_flip()
+  }
+  if(!is.null(facet) & facet != ''){
+    p<-p+facet_grid(as.formula(facet))
+  }
+  p
+  
 }
+
 
 filterCnt<-function(df, cnt){
   df %>%
