@@ -13,8 +13,10 @@ source('functions.R')
 
 c('circRNA_ID', 'sample', 'X.junction_reads', 'SM_MS_SMS', 'X.non_junction_reads', 
   'junction_reads_ratio', 'junction.Normal', 'junction.Tumor',
-  'non_junction.Normal', 'non_junction.Tumor', 'ratio.Normal',
-  'ratio.Tumor', 'ratio.Diff', 'p.values', 'fdr') ->
+  'non_junction.Normal', 'non_junction.Tumor', 
+  'depth.Normal', 'depth.Tumor', 'depth.Total',
+  'ratio.Normal', 'ratio.Tumor', 'ratio.Diff', 
+  'p.values', 'fdr') ->
   sample_columns
 
 shinyServer(function(input, output, session) {
