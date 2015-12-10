@@ -23,6 +23,14 @@ datatable_template<-function(data, ...){
   )
 }
 
+datatable_template2<-function(data, ...){
+  datatable(data, #filter='top',
+    extensions = c('Responsive','ColVis'),
+    options=list(pageLength = 5, dom = 'C<"clear">lfrtip'),
+    ...
+  )
+}
+
 loadCIRI<-function(ciri_files, nrow=-1){
   withProgress(message = 'Loading CIRI.merge files',
                detail = 'This may take a while...', value = 0, {

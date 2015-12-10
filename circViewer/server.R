@@ -216,7 +216,7 @@ shinyServer(function(input, output, session) {
   
   output$rows_circRNA_table<-DT::renderDataTable({
     selected_rows_circRNA() %>%
-      datatable_template(escape = F)
+      datatable_template2(escape = F)
   })
   
   selected_rows_samples<-reactive({
@@ -227,7 +227,7 @@ shinyServer(function(input, output, session) {
   
   output$rows_sample_table<-DT::renderDataTable({
     selected_rows_samples() %>%
-      datatable_template
+      datatable_template2
   })
   
   output$upset_samples<-renderPlot({
@@ -338,26 +338,30 @@ shinyServer(function(input, output, session) {
     exclude.columns<-setdiff(additionnal.choices, c())
       
     list(
-      selectInput('tbl_plot_x', 'X', choices = choices, selected='ratio.Diff'),
-      selectInput('tbl_plot_y', 'Y', choices = choices, selected='p.values'),
-      checkboxInput('tbl_plot_x_log', 'log(X)', F),
-      checkboxInput('tbl_plot_y_log', 'log(Y)', F),
-      checkboxInput('tbl_plot_flip', 'flip x y', F),
-      selectInput('tbl_plot_fill', 'fill', 
-                  choices = additionnal.choices, selected='NULL'),
-      selectInput('tbl_plot_color', 'color', 
-                  choices = additionnal.choices, selected='NULL'),
-      selectInput('tbl_plot_alpha', 'alpha', 
-                  choices = additionnal.choices, selected='NULL'),
-      selectInput('tbl_plot_group', 'group', 
-                  choices = additionnal.choices, selected='NULL'),
-      selectInput('tbl_plot_size', 'size',
-                  choices = additionnal.choices, selected='NULL'),
-      selectInput('tbl_plot_func', 'function',
-                  choices = c('geom_point', 'geom_bar','geom_boxplot'),
-                  selected='geom_point'),
-      textInput('tbl_plot_facet', 'facet by',
-                value = '. ~ sample')
+      column(6, style='background: rgba(255, 255, 255, 0.9);',
+        selectInput('tbl_plot_x', 'X', choices = choices, selected='ratio.Diff'),
+        selectInput('tbl_plot_y', 'Y', choices = choices, selected='p.values'),
+        checkboxInput('tbl_plot_x_log', 'log(X)', F),
+        checkboxInput('tbl_plot_y_log', 'log(Y)', F),
+        checkboxInput('tbl_plot_flip', 'flip x y', F),
+        selectInput('tbl_plot_func', 'function',
+                    choices = c('geom_point', 'geom_bar','geom_boxplot'),
+                    selected='geom_point'),
+        textInput('tbl_plot_facet', 'facet by',
+                  value = '. ~ sample')
+        ),
+      column(6, style='background: rgba(255, 255, 255, 0.9);',
+        selectInput('tbl_plot_fill', 'fill', 
+                    choices = additionnal.choices, selected='NULL'),
+        selectInput('tbl_plot_color', 'color', 
+                    choices = additionnal.choices, selected='NULL'),
+        selectInput('tbl_plot_alpha', 'alpha', 
+                    choices = additionnal.choices, selected='NULL'),
+        selectInput('tbl_plot_group', 'group', 
+                    choices = additionnal.choices, selected='NULL'),
+        selectInput('tbl_plot_size', 'size',
+                    choices = additionnal.choices, selected='NULL')
+        )
     )
   })
 

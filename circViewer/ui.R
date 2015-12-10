@@ -98,15 +98,20 @@ shinyUI(fluidPage(
                  class = 'btn-info btn-xs',
                  DT::dataTableOutput('rows_summary_table')
   ),
-  collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
-                 label = 'circRNA',
-                 class = 'btn-info btn-xs',
-                 DT::dataTableOutput('rows_circRNA_table')
-  ),
-  collapsibleDiv(id='selected_rows_sample_table', collapse = T,
-                 label = 'Samples',
-                 class = 'btn-info btn-xs',
-                 DT::dataTableOutput('rows_sample_table')
+  fixedPanel(
+    draggable=T, top=110, left=15, 
+    collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
+                   label = 'circRNA',
+                   style='background: #FFFFFF;',
+                   class = 'btn-info btn-xs',
+                   DT::dataTableOutput('rows_circRNA_table', width="500px")
+    ),
+    collapsibleDiv(id='selected_rows_sample_table', collapse = T,
+                   label = 'Samples',
+                   style='background: #FFFFFF;',
+                   class = 'btn-info btn-xs',
+                   DT::dataTableOutput('rows_sample_table', width="500px")
+    )
   ),
   collapsibleDiv(id='selected_rows_plot_table', collapse = T,
                  label = 'tablePlot',
