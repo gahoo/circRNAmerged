@@ -57,21 +57,8 @@ shinyUI(fluidPage(
                                 downloadButton('downloadTableData', 'Download'),
                                 verbatimTextOutput('criteria')
                  ),
-                 DT::dataTableOutput('ciri_datatable'),
+                 DT::dataTableOutput('ciri_datatable')
                  #actionButton('clear_selection','Clear Selection'),
-                 collapsibleDiv(id='subsetting', collapse = T,
-                                label = 'subsetting',
-                                class = 'btn-success btn-xs pull-right',
-                                icon = icon('info-sign',lib='glyphicon'),
-                                selectInput('subsettingBy', 'subsetting by:',
-                                            choices = c('rows', 'pages', 'none'),
-                                            selected = 'rows'),
-                                selectInput('showBy', 'show by:',
-                                            choices = c('circRNA_ID', 'symbol'),
-                                            selected='circRNA_ID'),
-                                checkboxInput('filter_only', 'use filtered data only', value = T),
-                                checkboxInput('col2row', 'colums 2 rows', value = F)
-                 )
   ),
   collapsibleDiv(id='selected_rows_summary_table', collapse = T,
                  label = 'summary',
@@ -194,5 +181,20 @@ shinyUI(fluidPage(
                  checkboxInput('batch_arcPlot', 'arc plot', T),
                  aceEditor("batch_ids", mode='txt', value="", height="200px"),
                  downloadButton('downloadPlotData', 'Download PDF')
-  )
+  ),
+  fixedPanel(
+    collapsibleDiv(id='subsetting', collapse = T,
+                   label = 'subsetting',
+                   class = 'btn-success btn-xs pull-right',
+                   icon = icon('info-sign',lib='glyphicon'),
+                   selectInput('subsettingBy', 'subsetting by:',
+                               choices = c('rows', 'pages', 'none'),
+                               selected = 'rows'),
+                   selectInput('showBy', 'show by:',
+                               choices = c('circRNA_ID', 'symbol'),
+                               selected='circRNA_ID'),
+                   checkboxInput('filter_only', 'use filtered data only', value = T),
+                   checkboxInput('col2row', 'colums 2 rows', value = F)
+    ),
+    right = 20, top=20, draggable = TRUE)
 ))
