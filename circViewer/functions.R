@@ -25,8 +25,15 @@ datatable_template<-function(data, ...){
 
 datatable_template2<-function(data, ...){
   datatable(data, #filter='top',
-    extensions = c('Responsive','ColVis'),
-    options=list(pageLength = 5, dom = 'C<"clear">lfrtip'),
+    extensions = c('Responsive','ColVis','Scroller'),
+    options=list(
+      #pageLength = -1,
+      #dom = 'C<"clear">lfrtip',
+      deferRender = TRUE,
+      dom = "ClfrtiS",
+      scrollY = 400,
+      scrollCollapse = F
+      ),
     ...
   )
 }
