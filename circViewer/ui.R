@@ -103,13 +103,13 @@ shinyUI(fluidPage(
     collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
                    label = 'circRNA',
                    style='background: #FFFFFF;',
-                   class = 'btn-info btn-xs',
+                   class = 'btn-primary btn-xs',
                    DT::dataTableOutput('rows_circRNA_table', width="500px")
     ),
     collapsibleDiv(id='selected_rows_sample_table', collapse = T,
                    label = 'Samples',
                    style='background: #FFFFFF;',
-                   class = 'btn-info btn-xs',
+                   class = 'btn-primary btn-xs',
                    DT::dataTableOutput('rows_sample_table', width="500px")
     )
   ),
