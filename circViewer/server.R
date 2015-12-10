@@ -173,6 +173,12 @@ shinyServer(function(input, output, session) {
   })
   
   ciri_selected<-reactive({
+    if(input$filter_only){
+      ciri_conductor<-ciri_merged_filter
+    }else{
+      ciri_conductor<-ciri_merged
+    }
+    
     if(input$subsettingBy=='rows'){
       row_id<-input$ciri_datatable_rows_selected
     }else if(input$subsettingBy=='pages'){
@@ -180,28 +186,19 @@ shinyServer(function(input, output, session) {
     }
     
     if(input$subsettingBy=='none'){
-      ciri_merged_filter()
+      ciri_conductor()
     }else{
       if(is.null(row_id)){
         row_id<-1
       }
       
-      if(filter_only){
-        # fix:make it a function
-        selected<-ciri_merged_filter()[row_id,] %>% fixSymbol
-        
-        columnName<-input$showBy
-        filterValues<-unique(selected[[columnName]])
-        filter_criteria <- interp(~ columnName %in% filterValues,
-                                  columnName=as.name(columnName))
-        
-        ciri_merged_filter() %>%
-          fixSymbol %>%
-          filter_(filter_criteria)
-      }else{
-        ciri_merged
-      }
-      
+      ciri_conductor() %>%
+        selectedFilter(
+          filterValues=row2filterValues(
+            ciri_merged_filter(),
+            row_id = row_id,
+            columnName = input$showBy),
+          columnName=input$showBy)
     }
   })
   

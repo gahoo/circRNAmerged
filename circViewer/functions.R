@@ -561,3 +561,19 @@ addCriteria<-function(column_name, filter_string, df_class, criteria){
   
   criteria
 }
+
+row2filterValues<-function(df, row_id, columnName){
+  df[row_id,] %>%
+    fixSymbol %>%
+    "[["(columnName) %>%
+    unique
+}
+
+selectedFilter<-function(df, filterValues, columnName){
+  filter_criteria <- interp(~ columnName %in% filterValues,
+                            columnName=as.name(columnName))
+  
+  df %>%
+    fixSymbol %>%
+    filter_(filter_criteria)
+}
