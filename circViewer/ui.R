@@ -83,6 +83,17 @@ shinyUI(fluidPage(
                  class = 'btn-info btn-xs',
                  DT::dataTableOutput('rows_sample_table')
   ),
+  collapsibleDiv(id='selected_rows_plot_table', collapse = F,
+                 label = 'tablePlot',
+                 class = 'btn-info btn-xs',
+                 collapsibleDiv(
+                   id='plot_table_controls', collapse = F,
+                   label = 'plotTblControls',
+                   class = 'btn-success btn-xs pull-right',
+                   uiOutput('tbl_plot_ctrls')
+                 ),
+                 plotOutput('table_plot', height='700px')
+  ),
   collapsibleDiv(id='selected_rows_set_samples', collapse = T,
                  label = 'SetsSamples',
                  class = 'btn-info btn-xs',

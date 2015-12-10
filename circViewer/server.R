@@ -332,6 +332,52 @@ shinyServer(function(input, output, session) {
       dev.off()
     })
   
+  output$tbl_plot_ctrls<-renderUI({
+    choices <- names(ciri_merged_filter())
+    additionnal.choices<-c('NULL', choices)
+    exclude.columns<-setdiff(additionnal.choices, c())
+      
+    list(
+      selectInput('tbl_plot_x', 'X', choices = choices, selected='ratio.Diff'),
+      selectInput('tbl_plot_y', 'Y', choices = choices, selected='p.values'),
+      checkboxInput('tbl_plot_x_log', 'log(X)', F),
+      checkboxInput('tbl_plot_y_log', 'log(Y)', F),
+      checkboxInput('tbl_plot_flip', 'flip x y', F),
+      selectInput('tbl_plot_fill', 'fill', 
+                  choices = additionnal.choices, selected='NULL'),
+      selectInput('tbl_plot_color', 'color', 
+                  choices = additionnal.choices, selected='NULL'),
+      selectInput('tbl_plot_alpha', 'alpha', 
+                  choices = additionnal.choices, selected='NULL'),
+      selectInput('tbl_plot_group', 'group', 
+                  choices = additionnal.choices, selected='NULL'),
+      selectInput('tbl_plot_size', 'size',
+                  choices = additionnal.choices, selected='NULL'),
+      selectInput('tbl_plot_func', 'function',
+                  choices = c('geom_point', 'geom_bar','geom_boxplot'),
+                  selected='geom_point'),
+      textInput('tbl_plot_facet', 'facet by',
+                value = '. ~ sample')
+    )
+  })
+
+  output$table_plot<-renderPlot({
+    ciri_selected() %>%
+      plotTable(
+        x=input$tbl_plot_x,
+        y=input$tbl_plot_y,
+        log_x=input$tbl_plot_x_log,
+        log_y=input$tbl_plot_y_log,
+        flip=input$tbl_plot_flip,
+        func=input$tbl_plot_func,
+        fill=input$tbl_plot_fill,
+        color=input$tbl_plot_color,
+        alpha=input$tbl_plot_alpha,
+        group=input$tbl_plot_group,
+        size=input$tbl_plot_size,
+        facet=input$tbl_plot_facet)
+  })
+
   output$helper<-renderText({
     #str(input$ciri_datatable_rows_all)
     #str(input$ciri_datatable_search_columns)
