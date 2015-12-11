@@ -7,6 +7,7 @@ library(tidyr)
 load('rmsk_0.0.1.RData')
 load('rmsk.family.RData')
 load('GeneRanges.RData')
+load('hpa_cancer.RData')
 txdb <- TxDb.Hsapiens.UCSC.hg19.knownGene
 data(genesymbol, package = "biovizBase")
 
