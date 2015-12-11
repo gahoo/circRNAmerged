@@ -249,15 +249,12 @@ collapsibleDiv(id='batch_mode', collapse = T,
 
 shinyUI(fluidPage(
   titlePanel("circRNA Viewer"),
+  tags$head(tags$script(src="resize.js")),
   textOutput('helper'),
   config,
   ciri_table,
-  summary_table,
   fixedPanel(
-    draggable=T, top=0, left=15, width='700px',
-    circRNA_table,
-    sample_table,
-    hpa_cancer,
+    draggable=T, top=63, left=58, width='700px',
     table_plot,
     upset_sample,
     upset_circRNA,
@@ -266,4 +263,11 @@ shinyUI(fluidPage(
     arc_plot
   ),
   batch_mode
+  fixedPanel(
+    draggable=T, top=0, left=15, width='700px',
+    circRNA_table,
+    sample_table,
+    hpa_cancer
+  ),
+  summary_table,
 ))
