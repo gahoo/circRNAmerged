@@ -394,6 +394,12 @@ shinyServer(function(input, output, session) {
       datatable
   })
 
+  output$hpa_cancer_symbols<-renderPlot({
+    ciri_selected() %>%
+      getSymbol %>%
+      plotHPA(position=input$hpa_position)
+  })
+
   output$helper<-renderText({
     #str(input$ciri_datatable_rows_all)
     #str(input$ciri_datatable_search_columns)

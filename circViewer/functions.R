@@ -338,24 +338,23 @@ plotRepeat<-function(repeatGranges, repeat.y, repeat.fill = 'strand'){
   }
 }
 
+getSymbol<-function(df){
+  df %>%
+    select(symbol, region_symbol) %>%
+    unique %>%
+    fixSymbol %>%
+    "$"("symbol") %>%
+    strsplit(split=',') %>%
+    unlist %>%
+    unique ->
+    symbol
+  symbol <- symbol[!is.na(symbol)]
+  idx<-symbol %in% genesymbol$symbol
+  symbol[idx]
+}
+
 plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
                     repeat.y=repeat_column, repeat.fill = 'strand'){
-  
-  getSymbol<-function(df){
-    df %>%
-      select(symbol, region_symbol) %>%
-      unique %>%
-      fixSymbol %>%
-      "$"("symbol") %>%
-      strsplit(split=',') %>%
-      unlist %>%
-      unique ->
-      symbol
-    symbol <- symbol[!is.na(symbol)]
-    idx<-symbol %in% genesymbol$symbol
-    symbol[idx]
-  }
-  
   checkError<-function(df){
     n_circRNA<-length(unique(df$circRNA_ID))
     n_chr<-length(unique(df$chr))
@@ -640,4 +639,16 @@ summaryTblNumCols<-function(df){
       p.values, fdr) %>%
     as.data.frame
   
+}
+
+plotHPA<-function(symbols, position='fill'){
+  hpa_cancer %>%
+    filter(Gene.name %in% symbols) %>%
+    ggplot(aes(x=Tumor, y=Count.patients, fill=Level)) +
+    geom_bar(stat='identity',position=position) +
+    scale_fill_manual(
+      breaks = c('High', 'Medium', 'Low', 'Not detected'),
+      values = c('pink', 'lightgreen', 'lightyellow', 'grey')) +
+    facet_wrap(~Gene.name) + 
+    coord_flip()
 }

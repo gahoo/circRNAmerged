@@ -99,7 +99,7 @@ shinyUI(fluidPage(
                  DT::dataTableOutput('rows_summary_table')
   ),
   fixedPanel(
-    draggable=T, top=110, left=15, 
+    draggable=T, top=0, left=15, 
     collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
                    label = 'circRNA',
                    style='background: #FFFFFF;',
@@ -111,6 +111,15 @@ shinyUI(fluidPage(
                    style='background: #FFFFFF;',
                    class = 'btn-primary btn-xs',
                    DT::dataTableOutput('rows_sample_table', width="500px")
+    ),
+    collapsibleDiv(id='selected_rows_symbol_hpa', collapse = T,
+                   label = 'HPA_Cancer',
+                   style='background: #FFFFFF;',
+                   class = 'btn-primary btn-xs',
+                   selectInput('hpa_position', 'position',
+                               choices=c('fill', 'stack', 'dodge'),
+                               selected='fill'),
+                   plotOutput('hpa_cancer_symbols', width='600px')
     )
   ),
   collapsibleDiv(id='selected_rows_plot_table', collapse = T,
