@@ -106,7 +106,7 @@ collapsibleDiv(id='selected_rows_circRNA_table', collapse = T,
                label = 'circRNA',
                style='background: #FFFFFF;',
                class = 'btn-primary btn-xs',
-               DT::dataTableOutput('rows_circRNA_table', width="500px")
+               DT::dataTableOutput('rows_circRNA_table')
 ) ->
   circRNA_table
 
@@ -114,7 +114,7 @@ collapsibleDiv(id='selected_rows_sample_table', collapse = T,
                label = 'Samples',
                style='background: #FFFFFF;',
                class = 'btn-primary btn-xs',
-               DT::dataTableOutput('rows_sample_table', width="500px")
+               DT::dataTableOutput('rows_sample_table')
 ) ->
   sample_table
 
@@ -125,7 +125,7 @@ collapsibleDiv(id='selected_rows_symbol_hpa', collapse = T,
                selectInput('hpa_position', 'position',
                            choices=c('fill', 'stack', 'dodge'),
                            selected='fill'),
-               plotOutput('hpa_cancer_symbols', width='600px')
+               plotOutput('hpa_cancer_symbols')
 ) ->
   hpa_cancer
 
@@ -145,14 +145,14 @@ collapsibleDiv(id='selected_rows_plot_table', collapse = T,
 collapsibleDiv(id='selected_rows_set_samples', collapse = T,
                label = 'SetsSamples',
                class = 'btn-info btn-xs',
-               plotOutput('upset_samples', height="700px")
+               plotOutput('upset_samples')
 )->
   upset_sample
 
 collapsibleDiv(id='selected_rows_set_circRNA', collapse = T,
                label = 'SetsCircRNA',
                class = 'btn-info btn-xs',
-               plotOutput('upset_circRNA', height="700px")
+               plotOutput('upset_circRNA', )
 )->
   upset_circRNA
 
@@ -173,7 +173,7 @@ collapsibleDiv(id='selected_rows_ratio_pattern', collapse = T,
                  checkboxInput('ratio_pattern_line',
                                'connect dots',value=T)
                ),
-               plotOutput('ratio_pattern', height="700px")
+               plotOutput('ratio_pattern', )
 )->
   ratio_pattern
 
@@ -200,10 +200,11 @@ collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                ),
                tabsetPanel(
                  tabPanel('d3heatmap',
-                          d3heatmapOutput('ratio_d3heatmap', height='700px')
+                          style='background: rgba(255, 255, 255, 0.9);',
+                          d3heatmapOutput('ratio_d3heatmap')
                  ),
                  tabPanel('pheatmap',
-                          plotOutput('ratio_pheatmap', height="700px")
+                          plotOutput('ratio_pheatmap', )
                  )
                )
 )->ratio_heatmap
@@ -231,7 +232,7 @@ collapsibleDiv(id='selected_rows_arc', collapse = T,
                              choices = c('name', 'score', 'class', 'family', 'strand'),
                              selected = 'strand')
                ),
-               plotOutput('arc_plot', height='700px')
+               plotOutput('arc_plot')
 )->
   arc_plot
 
@@ -253,16 +254,16 @@ shinyUI(fluidPage(
   ciri_table,
   summary_table,
   fixedPanel(
-    draggable=T, top=0, left=15, 
+    draggable=T, top=0, left=15, width='700px',
     circRNA_table,
     sample_table,
+    hpa_cancer,
     table_plot,
-    hpa_cancer
+    upset_sample,
+    upset_circRNA,
+    ratio_pattern,
+    ratio_heatmap,
+    arc_plot
   ),
-  upset_sample,
-  upset_circRNA,
-  ratio_pattern,
-  ratio_heatmap,
-  arc_plot,
   batch_mode
 ))
