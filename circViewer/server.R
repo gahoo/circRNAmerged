@@ -100,12 +100,19 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = 'Filtering table',
                  detail = 'This may take a while...')
+    if(input$preview_table){
+      func<-function(df){head(df,n=1000)}
+    }else{
+      func<-doNothing
+    }
     
     if(length(filtering[['criteria']])>0){
       ciri_merged() %>%
-        filter_(.dots = filtering[['criteria']] )
+        filter_(.dots = filtering[['criteria']] ) %>%
+        func
     }else{
-      ciri_merged()
+      ciri_merged() %>%
+        func
     }
   })
   
