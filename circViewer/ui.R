@@ -258,7 +258,8 @@ shinyUI(fluidPage(
   config,
   ciri_table,
   fixedPanel(
-    draggable=T, top=63, left=58, width='700px', class='resizable',
+    draggable=T, top=63, left=58, width='auto', height='auto', class='resizable',
+    style='border: 1px solid grey;',
     table_plot,
     upset_sample,
     upset_circRNA,
@@ -267,7 +268,8 @@ shinyUI(fluidPage(
     arc_plot
   ),
   fixedPanel(
-    draggable=T, top=0, left=15, width='700px', class='resizable',
+    draggable=T, top=0, left=15, width='auto', height='auto', class='resizable',
+    style='border: 1px solid grey;',
     circRNA_table,
     sample_table,
     hpa_cancer
