@@ -411,10 +411,16 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
   tracks(track_list, title=track_title, heights=track_height[names(track_list)])
 }
 
-plotAllFig<-function(ids, df, type='circRNA_ID', args=list()){
+plotAllFig<-function(ids, df, type='circRNA_ID', args=list(), dfProcessFunc=NULL){
   for(id in ids){
     for(plot_name in names(args)){
-      p<-do.call(plot_name, args=args[[plot_name]])
+      func_args<-args[[plot_name]]
+      filtering_string<-interp(sprintf("%s %%in%% id", type), id=id)
+      func_args[['df']]<-df %>% fixSymbol %>% filter_(filtering_string)
+      if(nrow(func_args[['df']])==0){
+        next
+      }
+      p<-do.call(plot_name, args=func_args)
       print(p)
     }
   }

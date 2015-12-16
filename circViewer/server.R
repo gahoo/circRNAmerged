@@ -320,6 +320,18 @@ shinyServer(function(input, output, session) {
         repeat.fill = input$track_repeats_fill
         )
   })
+
+  observe({
+    ciri_selected() %>% 
+      fixSymbol %>% 
+      "[["(input$showBy) %>% 
+      unique ->
+      ids
+    ids[!is.na(ids)] %>%
+      paste(collapse = '\n', sep='')-> 
+      ids
+    updateAceEditor(session, "batch_ids", ids)
+  })
   
   output$downloadPlotData <- downloadHandler(
     filename = function() {
@@ -333,9 +345,31 @@ shinyServer(function(input, output, session) {
     content = function(con) {
       pdf(con)
       input$batch_ids %>%
-        strsplit(split='\n') ->
+        strsplit(split='\n') %>%
+        unlist ->
         ids
-      plotAllFig(ids, ciri_merged_filter())
+      plotAllFig(ids, ciri_merged_filter(), type=input$showBy,
+                 args=list(
+                   plotRelExpPattern=list(
+                     facet=input$ratio_pattern_facet,
+                     significant2alpha=input$ratio_pattern_map_significant,
+                     line=input$ratio_pattern_line,
+                     p.value=input$ratio_pattern_p),
+                   plotTable=list(
+                     x=input$tbl_plot_x,
+                     y=input$tbl_plot_y,
+                     log_x=input$tbl_plot_x_log,
+                     log_y=input$tbl_plot_y_log,
+                     flip=input$tbl_plot_flip,
+                     func=input$tbl_plot_func,
+                     fill=input$tbl_plot_fill,
+                     color=input$tbl_plot_color,
+                     alpha=input$tbl_plot_alpha,
+                     group=input$tbl_plot_group,
+                     size=input$tbl_plot_size,
+                     facet=input$tbl_plot_facet)
+                   )
+                 )
       dev.off()
     })
   
