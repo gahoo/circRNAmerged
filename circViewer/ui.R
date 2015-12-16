@@ -43,6 +43,7 @@ fixedCollaspablePanel<-function(
 collapsibleDiv(id='selected_rows_summary_table', collapse = T,
                label = 'summary',
                class = 'btn-info btn-xs',
+               uiOutput('summary_columns'),
                DT::dataTableOutput('rows_summary_table')) ->
   summary_table
 

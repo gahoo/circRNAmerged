@@ -617,14 +617,14 @@ selectedFilter<-function(df, filterValues, columnName){
     filter_(filter_criteria)
 }
 
-summaryTblNumCols<-function(df){
+summaryTblNumCols<-function(df, columns=c('p.values', 'fdr')){
   median.inf_rm<-function(x){median(x[!is.infinite(x)])}
   mean.inf_rm<-function(x){mean(x[!is.infinite(x)])}
   sd.inf_rm<-function(x){sd(x[!is.infinite(x)])}
   
   df %>%
     group_by(sample) %>%
-    summarise_each(
+    summarise_each_(
       funs(
         min(.,na.rm=T),
         median=median.inf_rm,
@@ -632,12 +632,8 @@ summaryTblNumCols<-function(df){
         max(.,na.rm=T),
         sd=sd.inf_rm
         ),
-      matches('ratio'),
-      matches('depth'),
-      matches('rank'),
-      matches('Normal'),
-      matches('Tumor'),
-      p.values, fdr) %>%
+        columns
+    ) %>%
     as.data.frame
   
 }

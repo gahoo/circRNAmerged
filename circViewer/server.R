@@ -389,9 +389,17 @@ shinyServer(function(input, output, session) {
         facet=input$tbl_plot_facet)
   })
 
+  output$summary_columns<-renderUI({
+    column_classes<-sapply(ciri_selected(), class)
+    numberic_columns<-names(column_classes[!column_classes %in% c('factor', 'character', 'logical')])
+    selectizeInput('summary_columns', 'columns to summarize',
+                choices = numberic_columns, multiple = T,
+                selected = c('p.values', 'fdr'))
+  })
+
   output$rows_summary_table<-DT::renderDataTable({
     ciri_selected()%>%
-      summaryTblNumCols ->
+      summaryTblNumCols(columns=input$summary_columns) ->
       dt
     if(input$col2row){
       row.names(dt)<-dt$sample
