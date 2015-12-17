@@ -360,6 +360,8 @@ shinyServer(function(input, output, session) {
       plotAllFig(ids, ciri_merged_filter(), type=input$showBy, figs=input$batch_plots,
                  args=list(
                    plotHPA=list(position=input$hpa_position),
+                   plotSampleSets=list(),
+                   plotCircSets=list(),
                    plotRelExpPattern=list(
                      facet=input$ratio_pattern_facet,
                      significant2alpha=input$ratio_pattern_map_significant,
@@ -384,7 +386,15 @@ shinyServer(function(input, output, session) {
                      scale = input$d3heatmap_scale,
                      cluster_rows = input$pheatmap_cluster_rows,
                      cluster_cols = input$pheatmap_cluster_cols
-                     )
+                     ),
+                   plotTrack = list(
+                     plot.transcript = input$track_transcript,
+                     plot.repeats = input$track_repeats,
+                     extend_size = input$track_extend_size,
+                     flank_only = input$track_repeats_flank_only,
+                     repeat_column = input$track_repeats_column,
+                     repeat.y = input$track_repeats_y,
+                     repeat.fill = input$track_repeats_fill)
                    ),
                  dfPrepareFunc = list(
                    plotRelExpPheatmap = prepareHeatmapRatio
