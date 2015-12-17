@@ -78,6 +78,10 @@ plotSampleSets<-function(df, ...){
 }
 
 plotTable<-function(df, x, y, log_x=F, log_y=F, flip=F, facet=NULL, func='geom_point', ...){
+  if(is.null(func)){
+    return(NULL)
+  }
+  
   func.args<-list(
     geom_point=list(),
     geom_bar=list(stat='identity'),
@@ -224,6 +228,12 @@ prepareHeatmapRatio<-function(df, diff=F, color_fix=T, rownames_fix=T){
 
 plotRelExpHeatmap<-function(df){
   d3heatmap(df, scale = "column", colors = "Spectral")
+}
+
+plotRelExpPheatmap<-function(df, ...){
+  df %>%
+    as.matrix %>%
+    pheatmap(...)
 }
 
 prepareArc<-function(df){
@@ -411,12 +421,21 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
   tracks(track_list, title=track_title, heights=track_height[names(track_list)])
 }
 
-plotAllFig<-function(ids, df, type='circRNA_ID', args=list(), dfProcessFunc=NULL){
+plotAllFig<-function(ids, df, type='circRNA_ID', figs=NULL, 
+                     args=list(), dfPrepareFunc=NULL, dfPrepareFuncArgs=NULL){
+  args<-args[figs]
   for(id in ids){
     for(plot_name in names(args)){
       func_args<-args[[plot_name]]
       filtering_string<-interp(sprintf("%s %%in%% id", type), id=id)
-      func_args[['df']]<-df %>% fixSymbol %>% filter_(filtering_string)
+      func_args[['df']] <- df %>%
+        fixSymbol %>% 
+        filter_(filtering_string)
+      if(!is.null(dfPrepareFunc[[plot_name]])){
+        prepare_func_args<-c(list(func_args[['df']]), dfPrepareFuncArgs[[plot_name]])
+        func_args[['df']] <- do.call(dfPrepareFunc[[plot_name]],
+                                     args=prepare_func_args)
+      }
       if(nrow(func_args[['df']])==0){
         next
       }
@@ -644,9 +663,15 @@ summaryTblNumCols<-function(df, columns=c('p.values', 'fdr')){
   
 }
 
-plotHPA<-function(symbols, position='fill'){
+plotHPA<-function(df, position='fill'){
+  symbols<-getSymbol(df)
   hpa_cancer %>%
-    filter(Gene.name %in% symbols) %>%
+    filter(Gene.name %in% symbols) ->
+    hpa_cancer_fillter
+  if(nrow(hpa_cancer_fillter)==0){
+    return(NULL)
+  }
+  hpa_cancer_fillter %>%
     ggplot(aes(x=Tumor, y=Count.patients, fill=Level)) +
     geom_bar(stat='identity',position=position) +
     scale_fill_manual(
