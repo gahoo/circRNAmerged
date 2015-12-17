@@ -293,8 +293,7 @@ shinyServer(function(input, output, session) {
         diff=input$diff_ratio,
         color_fix=F,
         rownames_fix=F) %>%
-      as.matrix %>%
-      pheatmap(
+      plotRelExpPheatmap(
         color = colors_scheme,
         breaks = breaks,
         scale = input$d3heatmap_scale,
@@ -348,8 +347,19 @@ shinyServer(function(input, output, session) {
         strsplit(split='\n') %>%
         unlist ->
         ids
-      plotAllFig(ids, ciri_merged_filter(), type=input$showBy,
+      if(input$diff_ratio){
+        colors_scheme = colorRampPalette(c("green", "yellow", "red"))(41)
+        breaks = seq(-1,1,by = 0.05)
+        isSymbreaks <- T
+      }else{
+        colors_scheme = colorRampPalette(c("white", "blue"))(21)
+        breaks = seq(0,1,by = 0.05)
+        isSymbreaks <- F
+      }
+      
+      plotAllFig(ids, ciri_merged_filter(), type=input$showBy, figs=input$batch_plots,
                  args=list(
+                   plotHPA=list(position=input$hpa_position),
                    plotRelExpPattern=list(
                      facet=input$ratio_pattern_facet,
                      significant2alpha=input$ratio_pattern_map_significant,
@@ -367,7 +377,22 @@ shinyServer(function(input, output, session) {
                      alpha=input$tbl_plot_alpha,
                      group=input$tbl_plot_group,
                      size=input$tbl_plot_size,
-                     facet=input$tbl_plot_facet)
+                     facet=input$tbl_plot_facet),
+                   plotRelExpPheatmap=list(
+                     color = colors_scheme,
+                     breaks = breaks,
+                     scale = input$d3heatmap_scale,
+                     cluster_rows = input$pheatmap_cluster_rows,
+                     cluster_cols = input$pheatmap_cluster_cols
+                     )
+                   ),
+                 dfPrepareFunc = list(
+                   plotRelExpPheatmap = prepareHeatmapRatio
+                   ),
+                 dfPrepareFuncArgs = list(
+                   plotRelExpPheatmap = list(diff=input$diff_ratio,
+                                   color_fix=F,
+                                   rownames_fix=F)
                    )
                  )
       dev.off()
@@ -445,7 +470,6 @@ shinyServer(function(input, output, session) {
 
   output$hpa_cancer_symbols<-renderPlot({
     ciri_selected() %>%
-      getSymbol %>%
       plotHPA(position=input$hpa_position)
   })
 
