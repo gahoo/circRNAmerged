@@ -29,7 +29,7 @@ shinyServer(function(input, output, session) {
   ciri_list<-reactive({
     ciri_files<-dir(input$ciri_path)
     paste(input$ciri_path,ciri_files,sep='/') %>%
-      loadCIRI(nrow=input$preview_nrow)
+      loadCIRI(nrow=input$load_nrow)
   })
   
   ciri_rbind<-reactive({
@@ -152,7 +152,7 @@ shinyServer(function(input, output, session) {
   
   output$ciri_filtering_column<-renderUI({
     selectInput('ciri_filtering_column', 'Filter',
-                choices = c('free', names(ciri_merged_filter())),
+                choices = c('free', names(ciri_merged())),
                 selected = 'free')
   })
   
@@ -177,7 +177,7 @@ shinyServer(function(input, output, session) {
   
   output$criteria<-renderText({
     #update after reload
-    input$preview_nrow
+    input$load_nrow
     filtering[['criteria']] %>% paste(collapse = ', ')
   })
   

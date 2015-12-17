@@ -61,7 +61,7 @@ collapsibleDiv(
   class = 'btn-warning btn-xs pull-right',
   style='background: rgba(255, 255, 255, 0.9);',
   icon = icon('info-sign',lib='glyphicon'),
-  numericInput('preview_nrow', 'preview rows:',
+  numericInput('load_nrow', 'load rows:',
                min = -1, max = 1/0, value=10),
   checkboxInput('preview_table', 'preview', value = T),
   checkboxInput('anno_repeat', 'annotate repeat', value = F),
