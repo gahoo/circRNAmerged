@@ -339,7 +339,8 @@ shinyServer(function(input, output, session) {
              replacement = '') %>%
         paste0(collapse = '_') ->
         ciri_basename
-      paste(format(Sys.time(), "%Y-%b-%d_%X"), '.', ciri_basename, '.pdf', sep='')
+      input$batch_plots %>% paste0(collapse = '_') -> figs
+      paste(format(Sys.time(), "%Y-%b-%d_%s"), ciri_basename, figs, 'pdf', sep='.')
     },
     content = function(con) {
 
