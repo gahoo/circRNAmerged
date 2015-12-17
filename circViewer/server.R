@@ -342,11 +342,7 @@ shinyServer(function(input, output, session) {
       paste(format(Sys.time(), "%Y-%b-%d_%X"), '.', ciri_basename, '.pdf', sep='')
     },
     content = function(con) {
-      pdf(con)
-      input$batch_ids %>%
-        strsplit(split='\n') %>%
-        unlist ->
-        ids
+
       if(input$diff_ratio){
         colors_scheme = colorRampPalette(c("green", "yellow", "red"))(41)
         breaks = seq(-1,1,by = 0.05)
@@ -357,54 +353,88 @@ shinyServer(function(input, output, session) {
         isSymbreaks <- F
       }
       
-      plotAllFig(ids, ciri_merged_filter(), type=input$showBy, figs=input$batch_plots,
-                 args=list(
-                   plotHPA=list(position=input$hpa_position),
-                   plotSampleSets=list(),
-                   plotCircSets=list(),
-                   plotRelExpPattern=list(
-                     facet=input$ratio_pattern_facet,
-                     significant2alpha=input$ratio_pattern_map_significant,
-                     line=input$ratio_pattern_line,
-                     p.value=input$ratio_pattern_p),
-                   plotTable=list(
-                     x=input$tbl_plot_x,
-                     y=input$tbl_plot_y,
-                     log_x=input$tbl_plot_x_log,
-                     log_y=input$tbl_plot_y_log,
-                     flip=input$tbl_plot_flip,
-                     func=input$tbl_plot_func,
-                     fill=input$tbl_plot_fill,
-                     color=input$tbl_plot_color,
-                     alpha=input$tbl_plot_alpha,
-                     group=input$tbl_plot_group,
-                     size=input$tbl_plot_size,
-                     facet=input$tbl_plot_facet),
-                   plotRelExpPheatmap=list(
-                     color = colors_scheme,
-                     breaks = breaks,
-                     scale = input$d3heatmap_scale,
-                     cluster_rows = input$pheatmap_cluster_rows,
-                     cluster_cols = input$pheatmap_cluster_cols
-                     ),
-                   plotTrack = list(
-                     plot.transcript = input$track_transcript,
-                     plot.repeats = input$track_repeats,
-                     extend_size = input$track_extend_size,
-                     flank_only = input$track_repeats_flank_only,
-                     repeat_column = input$track_repeats_column,
-                     repeat.y = input$track_repeats_y,
-                     repeat.fill = input$track_repeats_fill)
-                   ),
-                 dfPrepareFunc = list(
-                   plotRelExpPheatmap = prepareHeatmapRatio
-                   ),
-                 dfPrepareFuncArgs = list(
-                   plotRelExpPheatmap = list(diff=input$diff_ratio,
-                                   color_fix=F,
-                                   rownames_fix=F)
-                   )
-                 )
+      all_fig_args=list(
+        plotHPA=list(position=input$hpa_position),
+        plotSampleSets=list(),
+        plotCircSets=list(),
+        plotRelExpPattern=list(
+          facet=input$ratio_pattern_facet,
+          significant2alpha=input$ratio_pattern_map_significant,
+          line=input$ratio_pattern_line,
+          p.value=input$ratio_pattern_p),
+        plotTable=list(
+          x=input$tbl_plot_x,
+          y=input$tbl_plot_y,
+          log_x=input$tbl_plot_x_log,
+          log_y=input$tbl_plot_y_log,
+          flip=input$tbl_plot_flip,
+          func=input$tbl_plot_func,
+          fill=input$tbl_plot_fill,
+          color=input$tbl_plot_color,
+          alpha=input$tbl_plot_alpha,
+          group=input$tbl_plot_group,
+          size=input$tbl_plot_size,
+          facet=input$tbl_plot_facet),
+        plotRelExpPheatmap=list(
+          color = colors_scheme,
+          breaks = breaks,
+          scale = input$d3heatmap_scale,
+          cluster_rows = input$pheatmap_cluster_rows,
+          cluster_cols = input$pheatmap_cluster_cols
+        ),
+        plotTrack = list(
+          plot.transcript = input$track_transcript,
+          plot.repeats = input$track_repeats,
+          extend_size = input$track_extend_size,
+          flank_only = input$track_repeats_flank_only,
+          repeat_column = input$track_repeats_column,
+          repeat.y = input$track_repeats_y,
+          repeat.fill = input$track_repeats_fill)
+      )
+      
+      dfPrepareFunc = list(
+        plotRelExpPheatmap = prepareHeatmapRatio
+      )
+      
+      dfPrepareFuncArgs = list(
+        plotRelExpPheatmap = list(
+          diff=input$diff_ratio,
+          color_fix=F,
+          rownames_fix=F)
+      )
+      
+      input$batch_ids %>%
+        strsplit(split='\n') %>%
+        unlist ->
+        ids
+      
+      plotAllFigShell<-function(ids){
+        plotAllFig(ids, ciri_merged_filter(), type=input$showBy, figs=input$batch_plots,
+                   args = all_fig_args, dfPrepareFunc=dfPrepareFunc,
+                   dfPrepareFuncArgs= dfPrepareFuncArgs)
+      }
+      
+      pdf(con)
+      if(input$batch_one_by_one){
+        withProgress(message = 'Batch Plot',
+                     detail = 'This may take a while...', value = 0, {
+                       n<-length(ids)
+                       step_size<-1/n
+                       for(id in ids){
+                         incProgress(step_size, detail=id)
+                         tryCatch({
+                           plotAllFigShell(id)
+                         }, error = function(e){
+                           incProgress(-step_size, detail=as.character(e))
+                           Sys.sleep(1)
+                           message(id, "\t", e)
+                         })
+                       }
+                     })
+      }else{
+        plotAllFigShell(ids)
+      }
+      
       dev.off()
     })
   

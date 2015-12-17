@@ -241,6 +241,7 @@ collapsibleDiv(id='selected_rows_arc', collapse = T,
 collapsibleDiv(id='batch_mode', collapse = T,
                label = 'batchMode',
                class = 'btn-info btn-xs',
+               checkboxInput('batch_one_by_one', 'one by one', T),
                selectizeInput('batch_plots', 'plot:', multiple=T,
                               choices=c(
                                 HPA_cancer = 'plotHPA',

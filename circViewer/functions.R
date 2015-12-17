@@ -425,24 +425,22 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
 plotAllFig<-function(ids, df, type='circRNA_ID', figs=NULL, 
                      args=list(), dfPrepareFunc=NULL, dfPrepareFuncArgs=NULL){
   args<-args[figs]
-  for(id in ids){
-    for(plot_name in names(args)){
-      func_args<-args[[plot_name]]
-      filtering_string<-interp(sprintf("%s %%in%% id", type), id=id)
-      func_args[['df']] <- df %>%
-        fixSymbol %>% 
-        filter_(filtering_string)
-      if(!is.null(dfPrepareFunc[[plot_name]])){
-        prepare_func_args<-c(list(func_args[['df']]), dfPrepareFuncArgs[[plot_name]])
-        func_args[['df']] <- do.call(dfPrepareFunc[[plot_name]],
-                                     args=prepare_func_args)
-      }
-      if(nrow(func_args[['df']])==0){
-        next
-      }
-      p<-do.call(plot_name, args=func_args)
-      print(p)
+  for(plot_name in names(args)){
+    func_args<-args[[plot_name]]
+    filtering_string<-interp(sprintf("%s %%in%% id", type), id=ids)
+    func_args[['df']] <- df %>%
+      fixSymbol %>% 
+      filter_(filtering_string)
+    if(!is.null(dfPrepareFunc[[plot_name]])){
+      prepare_func_args<-c(list(func_args[['df']]), dfPrepareFuncArgs[[plot_name]])
+      func_args[['df']] <- do.call(dfPrepareFunc[[plot_name]],
+                                   args=prepare_func_args)
     }
+    if(nrow(func_args[['df']])==0){
+      next
+    }
+    p<-do.call(plot_name, args=func_args)
+    print(p)
   }
 }
 
