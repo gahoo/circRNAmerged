@@ -146,7 +146,8 @@ plotCircSets<-function(df, cnt=0, ...){
     filter(circRNA_ID %in% candidates) %>%
     "$"("anno") -> candidates
   #row.names(df_set_t)<-df_set$circRNA_ID
-  df_set_t<-as.data.frame(t(df_set_t[,-1]))
+  df_set_t$circRNA_ID<-NULL
+  df_set_t<-as.data.frame(t(df_set_t))
   upset(df_set_t, sets = candidates, nsets = length(candidates), ...)
 }
 
