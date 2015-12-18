@@ -381,6 +381,7 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
     }
   }
   
+  df <- df %>% filter(!is.na(chr))
   error <- checkError(df)
   if(!is.null(error)){
     return(error)
@@ -571,6 +572,9 @@ rankCircRNA<-function(df) {
               ratio.Normal.sd = remove_na_zero(ratio.Normal.sd),
               ratio.Tumor.sd = remove_na_zero(ratio.Tumor.sd),
               ratio.Diff.sd = remove_na_zero(ratio.Diff.sd),
+              ratio.Diff.moreNormalCnt = -sum(ratio.diff < 0, na.rm=T),
+              ratio.Diff.moreTumorCnt = sum(ratio.diff > 0, na.rm=T),
+              ratio.Crossed = ratio.Diff.moreNormalCnt * ratio.Diff.moreTumorCnt,
               ratio.abs_diff = abs_diff(ratio.diff),
               ratio.rank = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd * ratio.Diff.sd),
               ratio.rank2 = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd),
