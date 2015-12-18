@@ -552,7 +552,10 @@ flank_both<-function(gr, width){
 }
 
 rankCircRNA<-function(df) {
-  abs_diff<-function(x){sqrt(sum(x^2)/length(x))}
+  abs_diff<-function(x){
+    x<-x[!is.na(x)&!is.infinite(x)]
+    sqrt(sum(x^2)/length(x))
+  }
   remove_na_zero<-function(x, v=1){ifelse(is.na(x)|x==0,v,x)}
   
   df %>%
