@@ -35,6 +35,7 @@ shinyServer(function(input, output, session) {
   ciri_rbind<-reactive({
     df<-do.call(rbind, ciri_list()) %>%
       mutate(length = circRNA_end - circRNA_start,
+             gene_id=as.character(gene_id),
              ratio.Diff = ratio.Tumor-ratio.Normal,
              depth.Normal = junction.Normal + non_junction.Normal,
              depth.Tumor = junction.Tumor + non_junction.Tumor,
