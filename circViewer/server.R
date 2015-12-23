@@ -124,7 +124,7 @@ shinyServer(function(input, output, session) {
              replacement = '') %>%
         paste0(collapse = '_') ->
         ciri_basename
-      paste(format(Sys.time(), "%Y-%b-%d_%X"), '.', ciri_basename, '.filtered.csv.gz', sep='')
+      paste(format(Sys.time(), "%Y-%b-%d_%s"), '.', ciri_basename, '.filtered.csv.gz', sep='')
     },
     content = function(con) {
       gzip <- gzfile(con, "w")
@@ -514,6 +514,25 @@ shinyServer(function(input, output, session) {
     ciri_selected() %>%
       plotHPA(position=input$hpa_position)
   })
+
+output$downloadFa <- downloadHandler(
+  filename = function() {
+    dir(input$ciri_path) %>%
+      gsub(pattern = '.CIRI.merged',
+           replacement = '') %>%
+      paste0(collapse = '_') ->
+      ciri_basename
+    paste(format(Sys.time(), "%Y-%b-%d_%s"), '.', ciri_basename, '.filtered.fa.gz', sep='')
+  },
+  content = function(con) {
+    gzip <- gzfile(con, "w")
+    ciri_merged_filter() %>%
+      loadFa(fafile=input$sequence_fa, by=input$showBy) ->
+      fa
+    writeXStringSet(fa, gzip)
+    close(gzip)
+  }
+)
 
   output$helper<-renderText({
     #str(input$ciri_datatable_rows_all)

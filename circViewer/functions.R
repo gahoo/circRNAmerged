@@ -3,6 +3,7 @@ library(GenomicRanges)
 library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(dplyr)
 library(tidyr)
+library(Rsamtools)
 
 load('rmsk_0.0.1.RData')
 load('rmsk.family.RData')
@@ -685,4 +686,15 @@ plotHPA<-function(df, position='fill'){
       values = c('pink', 'lightgreen', 'lightyellow', 'grey')) +
     facet_wrap(~Gene.name) + 
     coord_flip()
+}
+
+loadFa<-function(df, fafile, by='circRNA_ID'){
+  hg19<-FaFile(fafile)
+  if(by=='circRNA_ID'){
+    region<-df2GRanges(df)
+  }else{
+    symbol <- getSymbol(df)
+    region<-genesymbol[symbol]
+  }
+  getSeq(hg19, region)
 }

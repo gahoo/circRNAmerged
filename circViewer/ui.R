@@ -258,6 +258,15 @@ collapsibleDiv(id='batch_mode', collapse = T,
 )->
   batch_mode
 
+collapsibleDiv(id='sequence', collapse = T,
+               label = 'sequence',
+               class = 'btn-primary btn-xs',
+               textInput('sequence_fa', 'indexed fasta:'),
+               aceEditor("sequence_preview", mode='txt', value="", height="200px"),
+               downloadButton('downloadFa', 'Download Fa')
+)->
+  sequence
+
 shinyUI(fluidPage(
   titlePanel("circRNA Viewer"),
   tags$head(
@@ -283,6 +292,7 @@ shinyUI(fluidPage(
     style='border: 1px solid grey;',
     circRNA_table,
     sample_table,
+    sequence,
     hpa_cancer
   ),
   summary_table,
