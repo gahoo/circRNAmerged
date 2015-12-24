@@ -411,7 +411,7 @@ shinyServer(function(input, output, session) {
         ids
       
       plotAllFigShell<-function(ids){
-        plotAllFig(ids, ciri_merged_filter(), type=input$showBy, figs=input$batch_plots,
+        plotAllFig(ids, ciri_merged(), type=input$showBy, figs=input$batch_plots,
                    args = all_fig_args, dfPrepareFunc=dfPrepareFunc,
                    dfPrepareFuncArgs= dfPrepareFuncArgs)
       }
