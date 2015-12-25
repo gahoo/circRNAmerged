@@ -529,13 +529,11 @@ output$downloadFa <- downloadHandler(
           'filtered.fa', sep='.')
   },
   content = function(con) {
-    #gzip <- gzfile(con, "w")
     ciri_merged_filter() %>%
       loadFa(fafile=input$sequence_fa, by=input$showBy) ->
       fa
-    message(names(fa))
-    writeXStringSet(fa, con)
-    #close(gzip)
+    message(con)
+    writeXStringSet(x=fa, filepath=con, compress=F)
   }
 )
 
