@@ -64,6 +64,8 @@ collapsibleDiv(
   numericInput('load_nrow', 'load rows:',
                min = -1, max = 1/0, value=10),
   checkboxInput('preview_table', 'preview', value = T),
+  numericInput('preview_nrow', 'preview rows:',
+               min = -1, max = 1/0, value=1000),
   checkboxInput('anno_repeat', 'annotate repeat', value = F),
   numericInput('extend_size', 'extend size for repeat annotation:',
                value = '2000', min = 0, max = 100000),
@@ -73,6 +75,7 @@ collapsibleDiv(
   actionButton('remove_filter','Remove'),
   actionButton('clear_filter','Clear'),
   downloadButton('downloadTableData', 'Download'),
+  verbatimTextOutput('filter_nrow'),
   verbatimTextOutput('criteria')
 )->filtering
 

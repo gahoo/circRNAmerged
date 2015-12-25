@@ -101,19 +101,12 @@ shinyServer(function(input, output, session) {
     on.exit(progress$close())
     progress$set(message = 'Filtering table',
                  detail = 'This may take a while...')
-    if(input$preview_table){
-      func<-function(df){head(df,n=1000)}
-    }else{
-      func<-doNothing
-    }
     
     if(length(filtering[['criteria']])>0){
       ciri_merged() %>%
-        filter_(.dots = filtering[['criteria']] ) %>%
-        func
+        filter_(.dots = filtering[['criteria']] )
     }else{
-      ciri_merged() %>%
-        func
+      ciri_merged()
     }
   })
   
@@ -136,7 +129,14 @@ shinyServer(function(input, output, session) {
   )
   
   output$ciri_datatable<-DT::renderDataTable({
+    if(input$preview_table){
+      func<-function(df){head(df,n=input$preview_nrow)}
+    }else{
+      func<-doNothing
+    }
+    
     ciri_merged_filter() %>%
+      func %>%
       datatable_template
   })
   
@@ -180,7 +180,11 @@ shinyServer(function(input, output, session) {
   output$criteria<-renderText({
     #update after reload
     input$load_nrow
-    filtering[['criteria']] %>% paste(collapse = ', ')
+    filtering[['criteria']] %>% paste(collapse = '\n')
+  })
+
+  output$filter_nrow<-renderText({
+    ciri_merged_filter() %>% nrow
   })
   
   ciri_selected<-reactive({
