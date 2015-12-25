@@ -529,10 +529,13 @@ output$downloadFa <- downloadHandler(
           'filtered.fa', sep='.')
   },
   content = function(con) {
+    input$batch_ids %>%
+      strsplit(split='\n') %>%
+      unlist ->
+      ids
     ciri_merged_filter() %>%
-      loadFa(fafile=input$sequence_fa, by=input$showBy) ->
+      loadFa(fafile=input$sequence_fa, ids=ids, by=input$showBy) ->
       fa
-    message(con)
     writeXStringSet(x=fa, filepath=con, compress=F)
   }
 )

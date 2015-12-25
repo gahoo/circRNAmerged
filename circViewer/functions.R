@@ -689,13 +689,19 @@ plotHPA<-function(df, position='fill'){
     coord_flip()
 }
 
-loadFa<-function(df, fafile, by='circRNA_ID'){
+loadFa<-function(df, fafile, ids, by='circRNA_ID'){
   hg19<-FaFile(fafile)
   if(by=='circRNA_ID'){
-    region<-df2GRanges(df)
+    df %>%
+      filter(circRNA_ID %in% ids) %>%
+      df2GRanges ->
+      region
     seq_name<-with(as.data.frame(region), sprintf("%s:%s-%s", seqnames, start, end))
   }else{
-    symbol <- getSymbol(df)
+    df %>%
+      filter(region_symbol %in% ids) %>%
+      getSymbol ->
+      symbol
     region<-genesymbol[symbol]
     names(region)<-NULL
     seq_name<-with(as.data.frame(region), sprintf("%s:%s-%s|%s", seqnames, start, end, symbol))
