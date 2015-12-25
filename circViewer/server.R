@@ -122,9 +122,10 @@ shinyServer(function(input, output, session) {
       dir(input$ciri_path) %>%
         gsub(pattern = '.CIRI.merged',
              replacement = '') %>%
-        paste0(collapse = '_') ->
+        #paste0(collapse = '_') ->
+        length ->
         ciri_basename
-      paste(format(Sys.time(), "%Y-%b-%d_%s"), '.', ciri_basename, '.filtered.csv.gz', sep='')
+      paste(format(Sys.time(), "%Y-%m-%d.%s"), '.', ciri_basename, '.filtered.csv.gz', sep='')
     },
     content = function(con) {
       gzip <- gzfile(con, "w")
@@ -338,10 +339,11 @@ shinyServer(function(input, output, session) {
       dir(input$ciri_path) %>%
         gsub(pattern = '.CIRI.merged',
              replacement = '') %>%
-        paste0(collapse = '_') ->
+        #paste0(collapse = '_') ->
+        length ->
         ciri_basename
       input$batch_plots %>% paste0(collapse = '_') -> figs
-      paste(format(Sys.time(), "%Y-%b-%d_%s"), ciri_basename, figs, 'pdf', sep='.')
+      paste(format(Sys.time(), "%Y-%m-%d.%s"), ciri_basename, figs, 'pdf', sep='.')
     },
     content = function(con) {
 
@@ -520,9 +522,10 @@ output$downloadFa <- downloadHandler(
     dir(input$ciri_path) %>%
       gsub(pattern = '.CIRI.merged',
            replacement = '') %>%
-      paste0(collapse = '_') ->
+      #paste0(collapse = '_') ->
+      length ->
       ciri_basename
-    paste(format(Sys.time(), "%Y-%b-%d_%s"), '.', ciri_basename, '.filtered.fa.gz', sep='')
+    paste(format(Sys.time(), "%Y-%m-%d.%s"), '.', ciri_basename, '.filtered.fa.gz', sep='')
   },
   content = function(con) {
     gzip <- gzfile(con, "w")
