@@ -529,7 +529,7 @@ output$downloadFa <- downloadHandler(
       #paste0(collapse = '_') ->
       length ->
       ciri_basename
-    paste(format(Sys.time(), "%Y-%m-%d.%s"), '.', ciri_basename, '.filtered.fa.gz', sep='')
+    paste(format(Sys.time(), "%Y-%m-%d.%s"), '.', ciri_basename, input$showBy, '.filtered.fa.gz', sep='')
   },
   content = function(con) {
     gzip <- gzfile(con, "w")

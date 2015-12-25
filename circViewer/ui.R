@@ -256,19 +256,12 @@ collapsibleDiv(id='batch_mode', collapse = T,
                                 arcPlot='plotTrack'),
                               selected = c('ratioPattern', 'arcPlot')
                               ),
-               aceEditor("batch_ids", mode='txt', value="", height="200px"),
-               downloadButton('downloadPlotData', 'Download PDF')
-)->
-  batch_mode
-
-collapsibleDiv(id='sequence', collapse = T,
-               label = 'sequence',
-               class = 'btn-primary btn-xs',
                textInput('sequence_fa', 'indexed fasta:'),
-               aceEditor("sequence_preview", mode='txt', value="", height="200px"),
+               aceEditor("batch_ids", mode='txt', value="", height="200px"),
+               downloadButton('downloadPlotData', 'Download PDF'),
                downloadButton('downloadFa', 'Download Fa')
 )->
-  sequence
+  batch_mode
 
 shinyUI(fluidPage(
   titlePanel("circRNA Viewer"),
@@ -295,7 +288,6 @@ shinyUI(fluidPage(
     style='border: 1px solid grey;',
     circRNA_table,
     sample_table,
-    sequence,
     hpa_cancer
   ),
   summary_table,
