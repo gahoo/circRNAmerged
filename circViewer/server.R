@@ -523,22 +523,19 @@ shinyServer(function(input, output, session) {
 
 output$downloadFa <- downloadHandler(
   filename = function() {
-    dir(input$ciri_path) %>%
-      gsub(pattern = '.CIRI.merged',
-           replacement = '') %>%
-      #paste0(collapse = '_') ->
-      length ->
-      ciri_basename
-    message(input$showBy)
-    paste(format(Sys.time(), "%Y-%m-%d.%s"), '.', ciri_basename, '.filtered.fa.gz', sep='')
+    paste(format(Sys.time(), "%Y-%m-%d.%s"),
+          length(input$ciri_path),
+          input$showBy,
+          'filtered.fa', sep='.')
   },
   content = function(con) {
-    gzip <- gzfile(con, "w")
+    #gzip <- gzfile(con, "w")
     ciri_merged_filter() %>%
       loadFa(fafile=input$sequence_fa, by=input$showBy) ->
       fa
-    writeXStringSet(fa, gzip)
-    close(gzip)
+    message(names(fa))
+    writeXStringSet(fa, con)
+    #close(gzip)
   }
 )
 

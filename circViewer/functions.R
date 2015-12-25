@@ -693,9 +693,14 @@ loadFa<-function(df, fafile, by='circRNA_ID'){
   hg19<-FaFile(fafile)
   if(by=='circRNA_ID'){
     region<-df2GRanges(df)
+    seq_name<-with(as.data.frame(region), sprintf("%s:%s-%s", seqnames, start, end))
   }else{
     symbol <- getSymbol(df)
     region<-genesymbol[symbol]
+    names(region)<-NULL
+    seq_name<-with(as.data.frame(region), sprintf("%s:%s-%s|%s", seqnames, start, end, symbol))
   }
-  getSeq(hg19, region)
+  fa<-getSeq(hg19, region)
+  names(fa)<-seq_name
+  fa
 }

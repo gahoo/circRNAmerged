@@ -256,7 +256,7 @@ collapsibleDiv(id='batch_mode', collapse = T,
                                 arcPlot='plotTrack'),
                               selected = c('plotRelExpPattern', 'plotTrack')
                               ),
-               textInput('sequence_fa', 'indexed fasta:'),
+               textInput('sequence_fa', 'indexed fasta:', value = '../chrALL.fa'),
                aceEditor("batch_ids", mode='txt', value="", height="200px"),
                downloadButton('downloadPlotData', 'Download PDF'),
                downloadButton('downloadFa', 'Download Fa')
