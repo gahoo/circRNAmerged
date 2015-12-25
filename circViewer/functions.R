@@ -684,7 +684,7 @@ plotHPA<-function(df, position='fill'){
     geom_bar(stat='identity',position=position) +
     scale_fill_manual(
       breaks = c('High', 'Medium', 'Low', 'Not detected'),
-      values = c('pink', 'lightgreen', 'lightyellow', 'grey')) +
+      values = c('red4', 'rosybrown1', 'orangered2', 'grey')) +
     facet_wrap(~Gene.name) + 
     coord_flip()
 }
