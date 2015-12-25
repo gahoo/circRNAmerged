@@ -254,7 +254,7 @@ collapsibleDiv(id='batch_mode', collapse = T,
                                 ratioPattern='plotRelExpPattern',
                                 ratioHeatmap='plotRelExpPheatmap',
                                 arcPlot='plotTrack'),
-                              selected = c('ratioPattern', 'arcPlot')
+                              selected = c('plotRelExpPattern', 'plotTrack')
                               ),
                textInput('sequence_fa', 'indexed fasta:'),
                aceEditor("batch_ids", mode='txt', value="", height="200px"),
