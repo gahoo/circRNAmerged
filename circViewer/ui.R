@@ -266,9 +266,16 @@ collapsibleDiv(id='batch_mode', collapse = T,
 collapsibleDiv(id='qqPvalues', collapse = T,
                label = 'qqPvalues',
                class = 'btn-info btn-xs',
-               selectInput('qq_column', 'column:',
-                           choices = c('p.values', 'fdr', 'group.p.values', 'group.fdr'),
-                           selected = 'group.fdr'),
+               fixedCollaspablePanel(
+                 id='qq_controls', collapse = F,
+                 label = 'qqControls',
+                 class = 'btn-success btn-xs pull-right',
+                 icon = icon('info-sign',lib='glyphicon'),
+                 selectInput('qq_column', 'column:',
+                             choices = c('p.values', 'fdr', 'group.p.values', 'group.fdr'),
+                             selected = 'group.p.values'),
+                 checkboxInput('qq_facet', 'facet by sample', value = F)
+                 ),
                plotOutput('qqP')
 )->
   qqPvalues
