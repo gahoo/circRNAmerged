@@ -541,8 +541,14 @@ output$downloadFa <- downloadHandler(
 )
 
   output$qqP<-renderPlot({
+    if(input$qq_facet){
+      samples<-ciri_merged()[['sample']]
+    }else{
+      samples<-NULL
+    }
+    
     ciri_merged()[[input$qq_column]] %>%
-      ggqqP
+      ggqqP(samples)
   })
 
   output$helper<-renderText({

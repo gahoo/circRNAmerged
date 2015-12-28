@@ -731,13 +731,37 @@ loadFa<-function(df, fafile, ids, by='circRNA_ID'){
   fa
 }
 
-ggqqP <- function(pvector, title="Quantile-quantile plot of p-values") {
+ggqqP <- function(pvector, facet_vector=NULL, title="Quantile-quantile plot of p-values") {
   # Thanks to Daniel Shriner at NHGRI for providing this code for creating expected and observed values
-  o = -log10(sort(pvector,decreasing=F))
-  e = -log10( 1:length(o)/length(o) )
-  qplot(e,o, xlim=c(0,max(e)), ylim=c(0,max(o))) + 
+  df<-data.frame(p=pvector)
+  
+  if(!is.null(facet_vector)){
+    df$sample<-facet_vector
+  }
+  
+  df %>%
+    arrange(p) %>%
+    mutate(
+      o = -log10(p),
+      e = -log10( 1:nrow(df)/nrow(df) )
+    ) %>%
+    filter(!is.na(o), !is.infinite(o))->
+    df
+  ggplot(df, aes(x=e, y=o))+
     stat_abline(intercept=0,slope=1, col="red") +
-    scale_x_continuous(name=expression(Expected~~-log[10](italic(p))))+
-    scale_y_continuous(name=expression(Observed~~-log[10](italic(p))))+
-    ggtitle(title)
+    scale_x_continuous(
+      name=expression(Expected~~-log[10](italic(p))),
+      limits = c(0, max(df$e))
+      )+
+    scale_y_continuous(
+      name=expression(Observed~~-log[10](italic(p))),
+      limits = c(0, max(df$o))
+      )+
+    geom_point() +
+    ggtitle(title) ->
+    p
+  if(!is.null(facet_vector)){
+    p <- p + facet_wrap(~sample)
+  }
+  p
 }
