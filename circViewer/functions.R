@@ -560,6 +560,16 @@ rankCircRNA<-function(df) {
     sqrt(sum(x^2)/length(x))
   }
   remove_na_zero<-function(x, v=1){ifelse(is.na(x)|x==0,v,x)}
+  fisher_test<-function(a, b, c, d){
+    m<-cbind(a,b,c,d)
+    sapply(1:nrow(m), function(i){
+      m[i, ] %>%
+        unlist %>%
+        matrix(ncol=2) %>%
+        fisher.test %>%
+        "$"('p.value')
+    })
+  }
   
   df %>%
     select(circRNA_ID, ratio.Normal, ratio.Tumor) %>%
@@ -568,6 +578,13 @@ rankCircRNA<-function(df) {
            ratio.diff = ratio.Tumor - ratio.Normal) %>%
     group_by(circRNA_ID) %>%
     summarise(occurrence = n(),
+              junction.Normal.sum = sum(junction.Normal, na.rm=T),
+              junction.Tumor.sum = sum(junction.Tumor, na.rm=T),
+              non_junction.Normal.sum = sum(non_junction.Normal, na.rm=T),
+              non_junction.Tumor.sum = sum(non_junction.Tumor, na.rm=T),
+              group.p.value = fisher_test(
+                junction.Normal.sum, junction.Tumor.sum,
+                non_junction.Normal.sum, non_junction.Tumor.sum),
               ratio.Normal.sd = sd(ratio.Normal, na.rm=T),
               ratio.Tumor.sd = sd(ratio.Tumor, na.rm=T),
               ratio.Diff.sd = sd(ratio.diff, na.rm=T),
