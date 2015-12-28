@@ -584,10 +584,9 @@ rankCircRNA<-function(df) {
               junction.Tumor.sum = sum(junction.Tumor, na.rm=T),
               non_junction.Normal.sum = sum(non_junction.Normal, na.rm=T),
               non_junction.Tumor.sum = sum(non_junction.Tumor, na.rm=T),
-              group.p.value = fisher_test(
+              group.p.values = fisher_test(
                 junction.Normal.sum, junction.Tumor.sum,
                 non_junction.Normal.sum, non_junction.Tumor.sum),
-              group.fdr = p.adjust(group.p.value),
               ratio.Normal.sd = sd(ratio.Normal, na.rm=T),
               ratio.Tumor.sd = sd(ratio.Tumor, na.rm=T),
               ratio.Diff.sd = sd(ratio.diff, na.rm=T),
@@ -601,7 +600,8 @@ rankCircRNA<-function(df) {
               ratio.rank = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd * ratio.Diff.sd),
               ratio.rank2 = ratio.abs_diff/(ratio.Normal.sd * ratio.Tumor.sd),
               ratio.rank3 = ratio.abs_diff/ratio.Diff.sd
-    )
+    ) %>%
+    mutate(group.fdr = p.adjust(group.p.values))
 }
 
 rows2df<-function(df){
@@ -729,4 +729,15 @@ loadFa<-function(df, fafile, ids, by='circRNA_ID'){
   fa<-getSeq(hg19, region)
   names(fa)<-seq_name
   fa
+}
+
+ggqqP <- function(pvector, title="Quantile-quantile plot of p-values") {
+  # Thanks to Daniel Shriner at NHGRI for providing this code for creating expected and observed values
+  o = -log10(sort(pvector,decreasing=F))
+  e = -log10( 1:length(o)/length(o) )
+  qplot(e,o, xlim=c(0,max(e)), ylim=c(0,max(o))) + 
+    stat_abline(intercept=0,slope=1, col="red") +
+    scale_x_continuous(name=expression(Expected~~-log[10](italic(p))))+
+    scale_y_continuous(name=expression(Observed~~-log[10](italic(p))))+
+    ggtitle(title)
 }

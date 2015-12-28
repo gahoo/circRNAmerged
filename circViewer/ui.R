@@ -263,6 +263,16 @@ collapsibleDiv(id='batch_mode', collapse = T,
 )->
   batch_mode
 
+collapsibleDiv(id='qqPvalues', collapse = T,
+               label = 'qqPvalues',
+               class = 'btn-info btn-xs',
+               selectInput('qq_column', 'column:',
+                           choices = c('p.values', 'fdr', 'group.p.values', 'group.fdr'),
+                           selected = 'group.fdr'),
+               plotOutput('qqP')
+)->
+  qqPvalues
+
 shinyUI(fluidPage(
   titlePanel("circRNA Viewer"),
   tags$head(
@@ -277,6 +287,7 @@ shinyUI(fluidPage(
     draggable=T, top=63, left=58, width='auto', height='auto', class='resizable',
     style='border: 1px solid grey;',
     table_plot,
+    qqPvalues,
     upset_sample,
     upset_circRNA,
     ratio_pattern,

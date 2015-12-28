@@ -540,6 +540,11 @@ output$downloadFa <- downloadHandler(
   }
 )
 
+  output$qqP<-renderPlot({
+    ciri_merged()[[input$qq_column]] %>%
+      ggqqP
+  })
+
   output$helper<-renderText({
     #str(input$ciri_datatable_rows_all)
     #str(input$ciri_datatable_search_columns)
