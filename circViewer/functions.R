@@ -587,6 +587,7 @@ rankCircRNA<-function(df) {
               group.p.value = fisher_test(
                 junction.Normal.sum, junction.Tumor.sum,
                 non_junction.Normal.sum, non_junction.Tumor.sum),
+              group.fdr = p.adjust(group.p.value),
               ratio.Normal.sd = sd(ratio.Normal, na.rm=T),
               ratio.Tumor.sd = sd(ratio.Tumor, na.rm=T),
               ratio.Diff.sd = sd(ratio.diff, na.rm=T),
