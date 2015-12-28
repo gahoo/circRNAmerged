@@ -572,7 +572,9 @@ rankCircRNA<-function(df) {
   }
   
   df %>%
-    select(circRNA_ID, ratio.Normal, ratio.Tumor) %>%
+    select(circRNA_ID, ratio.Normal, ratio.Tumor,
+           junction.Normal, junction.Tumor,
+           non_junction.Normal, non_junction.Tumor) %>%
     mutate(ratio.Normal = 100 * ratio.Normal,
            ratio.Tumor = 100 * ratio.Tumor,
            ratio.diff = ratio.Tumor - ratio.Normal) %>%
