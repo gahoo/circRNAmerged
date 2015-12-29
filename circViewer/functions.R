@@ -92,6 +92,10 @@ plotTable<-function(df, x, y, log_x=F, log_y=F, flip=F, facet=NULL, func='geom_p
     )
   
   df %>%
+    filter_(sprintf("!is.na(%s)", x),
+            sprintf("!is.infinite(%s)", x),
+            sprintf("!is.na(%s)", y),
+            sprintf("!is.infinite(%s)", y)) %>%
     ggplot()+
     do.call(aes_string, list(x=x, y=y, ...))+
     do.call(func, args=func.args[[func]]) ->
