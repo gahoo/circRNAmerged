@@ -80,6 +80,8 @@ plotSampleSets<-function(df, ...){
 }
 
 plotTable<-function(df, x, y, log_x=F, log_y=F, flip=F, facet=NULL, func='geom_point', ...){
+  rm_inf<-function(x){x[!is.infinite(x)]}
+  
   if(is.null(func)){
     return(NULL)
   }
@@ -92,20 +94,22 @@ plotTable<-function(df, x, y, log_x=F, log_y=F, flip=F, facet=NULL, func='geom_p
     )
   
   df %>%
-    filter_(sprintf("!is.na(%s)", x),
-            sprintf("!is.infinite(%s)", x),
-            sprintf("!is.na(%s)", y),
-            sprintf("!is.infinite(%s)", y)) %>%
     ggplot()+
     do.call(aes_string, list(x=x, y=y, ...))+
     do.call(func, args=func.args[[func]]) ->
     p
   
   if(log_x){
-    p<-p+scale_x_log10()
+    x_lim<-df[[x]] %>% rm_inf
+    x_lim_min <- min(x_lim, na.rm=T)
+    x_lim_max <- max(x_lim, na.rm=T)
+    p<-p+scale_x_log10(limits=c(x_lim_min, x_lim_max))
   }
   if(log_y){
-    p<-p+scale_y_log10()
+    y_lim<-df[[y]] %>% rm_inf
+    y_lim_min <- min(y_lim, na.rm=T)
+    y_lim_max <- max(y_lim, na.rm=T)
+    p<-p+scale_y_log10(limits=c(y_lim_min, y_lim_max))
   }
   if(flip){
     p<-p+coord_flip()
