@@ -8,6 +8,7 @@ library(lazyeval)
 library(d3heatmap)
 library(pheatmap)
 library(RColorBrewer)
+library(digest)
 
 source('functions.R')
 
@@ -89,11 +90,27 @@ shinyServer(function(input, output, session) {
     progress$set(message = 'Building table',
                  detail = 'This may take a while...')
     
-    ciri_rbind() %>%
-      left_join(ciri_rbind_anno()) %>%
-      left_join(ciri_rbind_rmsk()) %>%
-      #left_join(ciri_rbind_db()) %>%
-      left_join(ciri_rbind_rank())
+    ciri_files<-dir(input$ciri_path)
+    md5<-list(ciri_files,
+              input$load_nrow,
+              input$extend_size,
+              input$anno_repeat) %>% 
+      digest
+    rdfile<-paste0(md5,'.RData')
+    message(rdfile)
+    if(file.exists(rdfile)){
+      load(file=rdfile)
+    }else{
+      ciri_rbind() %>%
+        left_join(ciri_rbind_anno()) %>%
+        left_join(ciri_rbind_rmsk()) %>%
+        #left_join(ciri_rbind_db()) %>%
+        left_join(ciri_rbind_rank()) ->
+        ciri_merged_df
+      save(ciri_merged_df, file=rdfile)
+    }
+    
+    ciri_merged_df
   })
   
   ciri_merged_filter<-reactive({
