@@ -96,7 +96,7 @@ shinyServer(function(input, output, session) {
               input$extend_size,
               input$anno_repeat) %>% 
       digest
-    rdfile<-paste0(md5,'.RData')
+    rdfile<-paste0('rdfiles/',md5,'.RData')
     message(rdfile)
     if(file.exists(rdfile)){
       load(file=rdfile)
