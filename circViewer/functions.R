@@ -88,7 +88,8 @@ plotTable<-function(df, x, y, log_x=F, log_y=F, flip=F, facet=NULL, func='geom_p
   func.args<-list(
     geom_point=list(),
     geom_bar=list(stat='identity'),
-    geom_boxplot=list()
+    geom_boxplot=list(),
+    geom_violin=list()
     )
   
   df %>%
@@ -563,13 +564,13 @@ rankCircRNA<-function(df) {
   remove_na_zero<-function(x, v=1){ifelse(is.na(x)|x==0,v,x)}
   fisher_test<-function(a, b, c, d){
     m<-cbind(a,b,c,d)
-    mclapply(1:nrow(m), function(i){
+    pvec(1:nrow(m), function(i){
       m[i, ] %>%
         unlist %>%
         matrix(ncol=2) %>%
         fisher.test %>%
         "$"('p.value')
-    }, mc.cores = 4)
+    }, mc.cores = ceiling(detectCores() / 4) )
   }
   
   df %>%

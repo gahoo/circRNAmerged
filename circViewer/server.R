@@ -459,7 +459,7 @@ shinyServer(function(input, output, session) {
         checkboxInput('tbl_plot_y_log', 'log(Y)', F),
         checkboxInput('tbl_plot_flip', 'flip x y', F),
         selectInput('tbl_plot_func', 'function',
-                    choices = c('geom_point', 'geom_bar','geom_boxplot'),
+                    choices = c('geom_point', 'geom_bar','geom_boxplot','geom_violin'),
                     selected='geom_point'),
         textInput('tbl_plot_facet', 'facet by',
                   value = '. ~ sample')
