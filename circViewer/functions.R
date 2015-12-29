@@ -4,6 +4,7 @@ library(TxDb.Hsapiens.UCSC.hg19.knownGene)
 library(dplyr)
 library(tidyr)
 library(Rsamtools)
+library(parallel)
 
 load('rmsk_0.0.1.RData')
 load('rmsk.family.RData')
@@ -562,13 +563,13 @@ rankCircRNA<-function(df) {
   remove_na_zero<-function(x, v=1){ifelse(is.na(x)|x==0,v,x)}
   fisher_test<-function(a, b, c, d){
     m<-cbind(a,b,c,d)
-    sapply(1:nrow(m), function(i){
+    mclapply(1:nrow(m), function(i){
       m[i, ] %>%
         unlist %>%
         matrix(ncol=2) %>%
         fisher.test %>%
         "$"('p.value')
-    })
+    }, mc.cores = 4)
   }
   
   df %>%
