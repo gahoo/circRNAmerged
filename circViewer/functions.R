@@ -300,6 +300,15 @@ fixSymbol<-function(df){
     )
 }
 
+fixGene<-function(df){
+  df %>%
+    mutate(
+      gene_id = as.character(gene_id),
+      region_gene_id = as.character(region_gene_id),
+      gene_id = ifelse(is.na(gene_id), region_gene_id, gene_id)
+    )
+}
+
 prepareRepeat<-function(df, extend_size=0, flank_only=F,
                         reverse_complement_only=T, 
                         repeat_column='name'){
@@ -374,6 +383,19 @@ getSymbol<-function(df){
   symbol <- symbol[!is.na(symbol)]
   idx<-symbol %in% genesymbol$symbol
   symbol[idx]
+}
+
+getGene<-function(df){
+  df %>%
+    select(gene_id, region_gene_id) %>%
+    unique %>%
+    fixGene %>%
+    "$"("gene_id") %>%
+    strsplit(split=',') %>%
+    unlist %>%
+    unique ->
+    gene_id
+  gene_id[!is.na(gene_id)]
 }
 
 plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
