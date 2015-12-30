@@ -103,6 +103,7 @@ collapsibleDiv(
   style='background: rgba(255, 255, 255, 0.9);',
   icon = icon('info-sign',lib='glyphicon'),
   checkboxInput('overlaping', 'filtered by overlaping bed file', value = F),
+  checkboxInput('anno_bed', 'annotate with bed file', value = F),
   textInput('overlaping_bed_file', 'Bed file', value='extra/snv.indel.csv.S3.bed')
 ) -> overlapping
 

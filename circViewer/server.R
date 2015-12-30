@@ -84,6 +84,21 @@ shinyServer(function(input, output, session) {
     ciri_rbind() %>% rankCircRNA
   })
   
+  ciri_rbind_bed<-reactive({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Annotate with bed file',
+                 detail = 'This may take a while...')
+    
+    if(input$anno_bed){
+      ciri_rbind() %>%
+        df2GRanges %>%
+        annotateBed(bed())
+    }else{
+      data.frame(circRNA_ID=factor())
+    }
+  })
+  
   ciri_merged<-reactive({
     progress <- shiny::Progress$new(session)
     on.exit(progress$close())
@@ -94,7 +109,8 @@ shinyServer(function(input, output, session) {
     md5<-list(ciri_files,
               input$load_nrow,
               input$extend_size,
-              input$anno_repeat) %>% 
+              input$anno_repeat,
+              input$anno_bed) %>% 
       digest
     rdfile<-paste0('rdfiles/',md5,'.RData')
     message(rdfile)
@@ -105,7 +121,8 @@ shinyServer(function(input, output, session) {
         left_join(ciri_rbind_anno()) %>%
         left_join(ciri_rbind_rmsk()) %>%
         #left_join(ciri_rbind_db()) %>%
-        left_join(ciri_rbind_rank()) ->
+        left_join(ciri_rbind_rank()) %>%
+        left_join(ciri_rbind_bed()) ->
         ciri_merged_df
       save(ciri_merged_df, file=rdfile)
     }

@@ -836,3 +836,11 @@ overlapBedDf<-function(df, bedRanges){
   df %>%
     filter(circRNA_ID %in% ids)
 }
+
+annotateBed<-function(dfRanges, bedRanges){
+  hits<-findOverlaps(dfRanges, bedRanges)
+  cbind(mcols(dfRanges[queryHits(hits)]),
+        mcols(bedRanges[subjectHits(hits)])) %>%
+    unique %>%
+    as.data.frame
+}
