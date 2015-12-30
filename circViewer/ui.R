@@ -234,6 +234,9 @@ collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                  ),
                  tabPanel('pheatmap',
                           plotOutput('ratio_pheatmap', )
+                 ),
+                 tabPanel('Expression',
+                          plotOutput('exp_pheatmap')
                  )
                )
 )->ratio_heatmap

@@ -248,6 +248,14 @@ plotRelExpPheatmap<-function(df, ...){
     pheatmap(...)
 }
 
+prepareHeatmap<-function(df, ...){
+  #should have other annotation
+  row.names(df)<-df$gene_id
+  df %>%
+    #should be a choice
+    select(-gene_id, -locus)
+}
+
 prepareArc<-function(df){
   prepare4rbind<-function(df, type){
     df %>% 

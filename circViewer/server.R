@@ -593,10 +593,23 @@ output$downloadFa <- downloadHandler(
       datatable_template2
   })
 
-  output$helper<-renderText({
-    #str(input$ciri_datatable_rows_all)
-    #str(input$ciri_datatable_search_columns)
-    #str(filtering[['criteria']])
+  output$exp_pheatmap<-renderPlot({
+    colors_scheme = colorRampPalette(c("white", "blue"))(100)
+    
+    exp_filter() %>%
+      prepareHeatmap %>%
+      plotRelExpPheatmap(
+        color = colors_scheme,
+        scale = input$d3heatmap_scale,
+        cluster_rows = input$pheatmap_cluster_rows,
+        cluster_cols = input$pheatmap_cluster_cols
+      )
+  })
+
+output$helper<-renderText({
+  #str(input$ciri_datatable_rows_all)
+  #str(input$ciri_datatable_search_columns)
+  #str(filtering[['criteria']])
     #input$add_filter
   })
 })
