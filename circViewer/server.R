@@ -113,17 +113,34 @@ shinyServer(function(input, output, session) {
     ciri_merged_df
   })
   
+  bed<-reactive({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Loading Bed',
+                 detail = 'This may take a while...')
+    
+    loadExtraData(input$overlaping_bed_file)
+  })
+  
   ciri_merged_filter<-reactive({
     progress <- shiny::Progress$new(session)
     on.exit(progress$close())
     progress$set(message = 'Filtering table',
                  detail = 'This may take a while...')
     
+    if(input$overlaping){
+      overlaping<-function(x){overlapBedDf(x, bedRanges=bed())}
+    }else{
+      overlaping<-doNothing
+    }
+    
     if(length(filtering[['criteria']])>0){
       ciri_merged() %>%
+        overlaping %>%
         filter_(.dots = filtering[['criteria']] )
     }else{
-      ciri_merged()
+      ciri_merged() %>%
+        overlaping
     }
   })
   

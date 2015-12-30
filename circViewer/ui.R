@@ -96,6 +96,16 @@ collapsibleDiv(
   #actionButton('clear_selection','Clear Selection'),
 ) -> subsetting
 
+collapsibleDiv(
+  id='overlaping', collapse = T,
+  label = 'overlaping',
+  class = 'btn-warning btn-xs pull-right',
+  style='background: rgba(255, 255, 255, 0.9);',
+  icon = icon('info-sign',lib='glyphicon'),
+  checkboxInput('overlaping', 'filtered by overlaping bed file', value = F),
+  textInput('overlaping_bed_file', 'Bed file', value='extra/snv.indel.csv.S3.bed')
+) -> overlapping
+
 collapsibleDiv(id='ciri_table', collapse = F,
                label = 'CIRI',
                class = 'btn-info btn-xs',
@@ -103,6 +113,7 @@ collapsibleDiv(id='ciri_table', collapse = F,
                fixedPanel(
                  draggable=T, top=40, right=5,
                  filtering,
+                 overlapping,
                  subsetting
                )) ->
   ciri_table

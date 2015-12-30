@@ -806,7 +806,7 @@ ggqqP <- function(pvector, facet_vector=NULL, title="Quantile-quantile plot of p
   p
 }
 
-loadExtraData<-function(filepath, obj_name){
+loadExtraData<-function(filepath, obj_name=NULL){
   if(grepl('.RData$', filepath)){
     load(file=filepath)
     data<-get(obj_name)
@@ -827,4 +827,12 @@ overlapMutations<-function(dfRanges, mutationRanges){
         mutationRanges[subjectHits(hits)] %>% as.data.frame
         ) %>%
     unique
+}
+
+overlapBedDf<-function(df, bedRanges){
+  dfRanges <- df2GRanges(df)
+  hits<-findOverlaps(dfRanges, bedRanges)
+  ids<-mcols(dfRanges[queryHits(hits) %>% unique])$circRNA_ID
+  df %>%
+    filter(circRNA_ID %in% ids)
 }
