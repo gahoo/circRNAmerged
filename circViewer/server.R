@@ -110,7 +110,8 @@ shinyServer(function(input, output, session) {
               input$load_nrow,
               input$extend_size,
               input$anno_repeat,
-              input$anno_bed) %>% 
+              input$anno_bed,
+              input$overlaping_bed_file) %>% 
       digest
     rdfile<-paste0('rdfiles/',md5,'.RData')
     message(rdfile)
