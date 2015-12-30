@@ -812,7 +812,7 @@ loadExtraData<-function(filepath, obj_name=NULL){
     data<-get(obj_name)
   }else if(grepl('.xls$', filepath)){
     data<-read.table(filepath, header=T, sep='\t')
-  }else if(grepl('.bed$', filepath)){
+  }else if(grepl('(.bed|.gz|.txt)$', filepath)){
     data<-read.delim(filepath, header=T, sep='\t') %>%
       makeGRangesFromDataFrame(keep.extra.columns=T)
   }else{
