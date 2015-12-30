@@ -143,7 +143,8 @@ collapsibleDiv(id='selected_exp_table', collapse = T,
                  label = 'expFiles',
                  class = 'btn-success btn-xs pull-right',
                  icon = icon('info-sign',lib='glyphicon'),
-                 textInput('exp_file', 'Expression file', value='extra/lnc_exp.xls')
+                 textInput('exp_file', 'Expression file', value='extra/lnc_exp.RData'),
+                 textInput('extra_obj_name', 'RData object name', value='lnc_exp')
                  ),
                DT::dataTableOutput('rows_exp_table', width='800px')
 ) ->

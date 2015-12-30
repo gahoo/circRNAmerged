@@ -574,14 +574,7 @@ output$downloadFa <- downloadHandler(
     progress$set(message = 'Loading Expression',
                  detail = 'This may take a while...')
     
-    if(grepl('.RData$', input$exp_file)){
-      load(file=input$exp_file)
-    }else if(grepl('.xls$', input$exp_file)){
-      exp<-read.table(input$exp_file, header=T, sep='\t')
-    }else{
-      exp<-NULL
-    }
-    exp
+    loadExtraData(input$exp_file, input$extra_obj_name)
   })
 
   exp_filter<-reactive({
