@@ -134,6 +134,29 @@ collapsibleDiv(id='selected_rows_symbol_hpa', collapse = T,
 ) ->
   hpa_cancer
 
+collapsibleDiv(id='selected_exp_table', collapse = T,
+               label = 'Expression',
+               style='background: #FFFFFF;',
+               class = 'btn-primary btn-xs',
+               fixedCollaspablePanel(
+                 id='exp_files', collapse = F,
+                 label = 'expFiles',
+                 class = 'btn-success btn-xs pull-right',
+                 icon = icon('info-sign',lib='glyphicon'),
+                 textInput('exp_file', 'Expression file', value='extra/lnc_exp.xls')
+                 ),
+               DT::dataTableOutput('rows_exp_table', width='800px')
+) ->
+  exp_table
+
+collapsibleDiv(id='selected_mutation_table', collapse = T,
+               label = 'Mutation',
+               style='background: #FFFFFF;',
+               class = 'btn-primary btn-xs',
+               DT::dataTableOutput('rows_mutation_table', width='800px')
+) ->
+  mutation_table
+
 collapsibleDiv(id='selected_rows_plot_table', collapse = T,
                label = 'tablePlot',
                class = 'btn-info btn-xs',
@@ -306,6 +329,8 @@ shinyUI(fluidPage(
     style='border: 1px solid grey;',
     circRNA_table,
     sample_table,
+    exp_table,
+    mutation_table,
     hpa_cancer
   ),
   summary_table,

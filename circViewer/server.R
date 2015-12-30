@@ -568,6 +568,38 @@ output$downloadFa <- downloadHandler(
       ggqqP(samples)
   })
 
+  exp<-reactive({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Loading Expression',
+                 detail = 'This may take a while...')
+    
+    if(grepl('.RData$', input$exp_file)){
+      load(file=input$exp_file)
+    }else if(grepl('.xls$', input$exp_file)){
+      exp<-read.table(input$exp_file, header=T, sep='\t')
+    }else{
+      exp<-NULL
+    }
+    exp
+  })
+
+  exp_filter<-reactive({
+    ciri_selected() %>%
+      getGene ->
+      gene_ids
+    
+    exp() %>%
+      filter(gene_id %in% gene_ids)
+  })
+
+  output$rows_exp_table<-DT::renderDataTable({
+    transformerFunc<-transformer(input$col2row)
+    exp_filter() %>%
+      transformerFunc %>%
+      datatable_template2
+  })
+
   output$helper<-renderText({
     #str(input$ciri_datatable_rows_all)
     #str(input$ciri_datatable_search_columns)
