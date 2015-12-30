@@ -593,11 +593,23 @@ output$downloadFa <- downloadHandler(
       datatable_template2
   })
 
+  output$exp_heatmap_ui<-renderUI({
+    exp_columns<-exp() %>% names
+    list(
+      selectizeInput('exp_heatmap_anno_column', 'Annotation column', multiple = T,
+                     choices = exp_columns, selected = 'gene_id'),
+      selectizeInput('exp_heatmap_exclude_columns', 'Exclude columns', multiple = T,
+                     choices = exp_columns, selected = 'gene_id')
+      )
+  })
+
   output$exp_pheatmap<-renderPlot({
     colors_scheme = colorRampPalette(c("white", "blue"))(100)
     
     exp_filter() %>%
-      prepareHeatmap %>%
+      prepareHeatmap(
+        anno_column = input$exp_heatmap_anno_column,
+        exclude_columns = input$exp_heatmap_exclude_columns) %>%
       plotRelExpPheatmap(
         color = colors_scheme,
         scale = input$d3heatmap_scale,

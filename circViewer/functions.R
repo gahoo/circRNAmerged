@@ -248,12 +248,12 @@ plotRelExpPheatmap<-function(df, ...){
     pheatmap(...)
 }
 
-prepareHeatmap<-function(df, ...){
-  #should have other annotation
-  row.names(df)<-df$gene_id
+prepareHeatmap<-function(df, anno_column, exclude_columns=NULL){
+  row_names_list<-as.list(df[anno_column])
+  row_names_list$sep='\t'
+  row.names(df)<-do.call(paste, row_names_list)
   df %>%
-    #should be a choice
-    select(-gene_id, -locus)
+    select_(.dots = paste0('-', exclude_columns))
 }
 
 prepareArc<-function(df){
@@ -811,6 +811,9 @@ loadExtraData<-function(filepath, obj_name){
     data<-get(obj_name)
   }else if(grepl('.xls$', filepath)){
     data<-read.table(filepath, header=T, sep='\t')
+  }else if(grepl('.bed$', filepath)){
+    data<-read.table(filepath, header=T, sep='\t') %>%
+      makeGRangesFromDataFrame(keep.extra.columns=T)
   }else{
     data<-NULL
   }

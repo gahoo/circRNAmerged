@@ -225,7 +225,8 @@ collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                  checkboxInput('pheatmap_cluster_cols',
                                'cluster columns', value = F),
                  checkboxInput('pheatmap_cluster_rows',
-                               'cluster rows', value = F)
+                               'cluster rows', value = F),
+                 uiOutput('exp_heatmap_ui')
                ),
                tabsetPanel(
                  tabPanel('d3heatmap',
