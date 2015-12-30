@@ -250,7 +250,7 @@ plotRelExpPheatmap<-function(df, ...){
 
 prepareHeatmap<-function(df, anno_column, exclude_columns=NULL){
   row_names_list<-as.list(df[anno_column])
-  row_names_list$sep='\t'
+  row_names_list$sep='|'
   row.names(df)<-do.call(paste, row_names_list)
   df %>%
     select_(.dots = paste0('-', exclude_columns))
