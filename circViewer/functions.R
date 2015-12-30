@@ -796,3 +796,15 @@ ggqqP <- function(pvector, facet_vector=NULL, title="Quantile-quantile plot of p
   }
   p
 }
+
+loadExtraData<-function(filepath, obj_name){
+  if(grepl('.RData$', filepath)){
+    load(file=filepath)
+    data<-get(obj_name)
+  }else if(grepl('.xls$', filepath)){
+    data<-read.table(filepath, header=T, sep='\t')
+  }else{
+    data<-NULL
+  }
+  data
+}
