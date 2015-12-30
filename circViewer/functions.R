@@ -317,21 +317,22 @@ fixGene<-function(df){
     )
 }
 
+df2extendRanges<- function(df, flank_only, extend_size){
+  if(flank_only){
+    change_range<-flank_both
+  }else{
+    change_range<-extend
+  }
+  
+  df %>%
+    df2GRanges %>%
+    change_range(extend_size)->
+    which
+}
+
 prepareRepeat<-function(df, extend_size=0, flank_only=F,
                         reverse_complement_only=T, 
                         repeat_column='name'){
-  df2extendRanges<- function(df){
-    if(flank_only){
-      change_range<-flank_both
-    }else{
-      change_range<-extend
-    }
-    
-    df %>%
-      df2GRanges %>%
-      change_range(extend_size)->
-      which
-  }
   
   reverseComplementFilter<-function(repeats){
     repeats %>%
@@ -350,7 +351,7 @@ prepareRepeat<-function(df, extend_size=0, flank_only=F,
     repeats[rev_comp_idx]
   }
   
-  which <- df2extendRanges(df)
+  which <- df2extendRanges(df, flank_only, extend_size)
   repeats <- subsetByOverlaps(rmsk, which, ignore.strand=T)
   mcols(repeats) %>%
     as.data.frame %>%
@@ -654,7 +655,7 @@ rows2df<-function(df){
     do.call(what=cbind)
 }
 
-doNothing<-function(df){
+doNothing<-function(df, ...){
   df
 }
 
@@ -812,10 +813,18 @@ loadExtraData<-function(filepath, obj_name){
   }else if(grepl('.xls$', filepath)){
     data<-read.table(filepath, header=T, sep='\t')
   }else if(grepl('.bed$', filepath)){
-    data<-read.table(filepath, header=T, sep='\t') %>%
+    data<-read.delim(filepath, header=T, sep='\t') %>%
       makeGRangesFromDataFrame(keep.extra.columns=T)
   }else{
     data<-NULL
   }
   data
+}
+
+overlapMutations<-function(dfRanges, mutationRanges){
+  hits<-findOverlaps(dfRanges, mutationRanges)
+  cbind(mcols(dfRanges[queryHits(hits)]),
+        mutationRanges[subjectHits(hits)] %>% as.data.frame
+        ) %>%
+    unique
 }

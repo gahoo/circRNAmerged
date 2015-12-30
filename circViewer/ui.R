@@ -154,6 +154,18 @@ collapsibleDiv(id='selected_mutation_table', collapse = T,
                label = 'Mutation',
                style='background: #FFFFFF;',
                class = 'btn-primary btn-xs',
+               fixedCollaspablePanel(
+                 id='mutation_files', collapse = F,
+                 label = 'mutation',
+                 class = 'btn-success btn-xs pull-right',
+                 icon = icon('info-sign',lib='glyphicon'),
+                 textInput('mutation_file', 'Mutation file', value='extra/snv.indel.csv.S3.bed'),
+                 textInput('mutation_obj_name', 'RData object name', value='mutation'),
+                 checkboxInput('mutation_extend', 'extend circRNA flanking', value=F),
+                 checkboxInput('mutation_flank_only', 'flank only', value=F),
+                 numericInput('mutation_extend_size', 'extend size for repeat:',
+                              value = '2000', min = 0, max = 100000)
+               ),
                DT::dataTableOutput('rows_mutation_table', width='800px')
 ) ->
   mutation_table

@@ -618,6 +618,38 @@ output$downloadFa <- downloadHandler(
       )
   })
 
+  mutation<-reactive({
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Loading Mutation',
+                 detail = 'This may take a while...')
+    
+    loadExtraData(input$mutation_file, input$extra_obj_name)
+  })
+  
+  mutation_filter<-reactive({
+    if(input$mutation_extend){
+      makeRanges<-function(x){
+        df2extendRanges(x, 
+          flank_only = input$mutation_flank_only,
+          extend_size = input$mutation_extend_size)
+      }
+    }else{
+      makeRanges<-df2GRanges
+    }
+    
+    ciri_selected() %>%
+      makeRanges %>%
+      overlapMutations(mutation())
+  })
+  
+  output$rows_mutation_table<-DT::renderDataTable({
+    transformerFunc<-transformer(input$col2row)
+    mutation_filter() %>%
+      transformerFunc %>%
+      datatable_template2
+  })
+
 output$helper<-renderText({
   #str(input$ciri_datatable_rows_all)
   #str(input$ciri_datatable_search_columns)
