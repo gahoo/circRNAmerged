@@ -381,6 +381,26 @@ plotRepeat<-function(repeatGranges, repeat.y, repeat.fill = 'strand'){
   }
 }
 
+plotMutation<-function(mutation, mutation.y='circRNA_ID',
+                       mutation.fill='strand',
+                       mutation.color=mutation.fill){
+  if(nrow(mutation)!=0){
+    mutation$width<-NULL
+    mutation.gr <- makeGRangesFromDataFrame(mutation, keep.extra.columns=T)
+    ggbio() + 
+      geom_rect(
+        data = mutation.gr,
+        aes_string(group = mutation.y, 
+                   fill = mutation.fill, 
+                   color = mutation.color),
+        alpha = 0.7,
+        label = T)
+  }else{
+    NULL
+  }
+  
+}
+
 getSymbol<-function(df){
   df %>%
     select(symbol, region_symbol) %>%
@@ -409,8 +429,9 @@ getGene<-function(df){
   gene_id[!is.na(gene_id)]
 }
 
-plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
-                    repeat.y=repeat_column, repeat.fill = 'strand'){
+plotTrack<-function(df, plot.arc=T, plot.transcript=T, plot.repeats=T, plot.mutation=T,
+                    ..., repeat.y=repeat_column, repeat.fill = 'strand', mutation=NULL,
+                    mutation.y=NULL, mutation.fill = 'strand'){
   checkError<-function(df){
     n_circRNA<-length(unique(df$circRNA_ID))
     n_chr<-length(unique(df$chr))
@@ -433,7 +454,11 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
   
   symbol <- getSymbol(df)
   
-  df %>% prepareArc %>% plotArc -> arc
+  if(plot.arc){
+    arc <- df %>% prepareArc %>% plotArc
+  }else{
+    arc <- NULL
+  }
   
   if(plot.repeats){
     df %>%
@@ -456,13 +481,20 @@ plotTrack<-function(df, plot.transcript=T, plot.repeats=T, ...,
     track_title <- paste0(unique(df$circRNA_ID), collapse = "; ")
   }
   
+  if(plot.mutation){
+    mutation<-plotMutation(mutation, mutation.y, mutation.fill)
+  }else{
+    mutation <- NULL
+  }
+  
   track_list<-list(
     arc=arc,
     repeats=repeats,
-    transcripts=transcripts
+    transcripts=transcripts,
+    mutation=mutation
   )
   
-  track_height<-c(arc=6, repeats=2, transcripts=2)
+  track_height<-c(arc=6, repeats=2, transcripts=2, mutation=2)
   track_list<-track_list[!sapply(track_list, is.null)]
   tracks(track_list, title=track_title, heights=track_height[names(track_list)])
 }

@@ -378,13 +378,18 @@ shinyServer(function(input, output, session) {
     
     ciri_selected() %>%
       plotTrack(
+        plot.arc = input$track_arc,
         plot.transcript = input$track_transcript,
         plot.repeats = input$track_repeats,
+        plot.mutation = input$track_mutation,
         extend_size = input$track_extend_size,
         flank_only = input$track_repeats_flank_only,
         repeat_column = input$track_repeats_column,
         repeat.y = input$track_repeats_y,
-        repeat.fill = input$track_repeats_fill
+        repeat.fill = input$track_repeats_fill,
+        mutation = mutation_filter(),
+        mutation.y = input$track_mutation_y,
+        mutation.fill = input$track_mutation_fill
         )
   })
 
@@ -696,6 +701,24 @@ output$downloadFa <- downloadHandler(
     mutation_filter() %>%
       transformerFunc %>%
       datatable_template2
+  })
+
+  output$track_mutation_ui<-renderUI({
+    mutation() %>%
+      head %>%
+      as.data.frame %>%
+      colnames %>%
+      c('circRNA_ID') ->
+      mutation_columns
+    
+    list(
+      selectInput('track_mutation_y', 'mutation.y',
+                  choices = mutation_columns, 
+                  selected = 'circRNA_ID'),
+      selectInput('track_mutation_fill', 'mutation.fill',
+                  choices = mutation_columns, 
+                  selected = 'strand')
+      )
   })
 
 output$helper<-renderText({

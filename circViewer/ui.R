@@ -271,6 +271,7 @@ collapsibleDiv(id='selected_rows_arc', collapse = T,
                  label = 'arcControls',
                  class = 'btn-success btn-xs pull-right',
                  icon = icon('info-sign',lib='glyphicon'),
+                 checkboxInput('track_arc', 'plot arc', value=T),
                  checkboxInput('track_transcript', 'plot transcript', value=F),
                  checkboxInput('track_repeats', 'plot repeats', value=F),
                  checkboxInput('track_repeats_flank_only', 'flank only', value=F),
@@ -284,7 +285,9 @@ collapsibleDiv(id='selected_rows_arc', collapse = T,
                              selected = 'name'),
                  selectInput('track_repeats_fill', 'repeat fill color by', 
                              choices = c('name', 'score', 'class', 'family', 'strand'),
-                             selected = 'strand')
+                             selected = 'strand'),
+                 checkboxInput('track_mutation', 'plot mutation', value=F),
+                 uiOutput('track_mutation_ui')
                ),
                plotOutput('arc_plot')
 )->
