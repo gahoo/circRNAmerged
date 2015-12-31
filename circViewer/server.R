@@ -249,6 +249,20 @@ ciri_merged_filter<-reactive({
   output$filter_nrow<-renderText({
     ciri_merged_filter() %>% nrow
   })
+
+  observeEvent(input$clean_cache,{
+    progress <- shiny::Progress$new(session)
+    on.exit(progress$close())
+    progress$set(message = 'Clean rdfiles cache',
+                 detail = 'This may take a while...')
+    
+    rdfiles<-dir('rdfiles', pattern='*.RData')
+    message(rdfiles)
+    if(length(rdfiles)>0){
+      paste0('rdfiles/', rdfiles) %>%
+        file.remove()
+    }
+  })
   
   ciri_selected<-reactive({
     if(input$filter_only){

@@ -76,7 +76,8 @@ collapsibleDiv(
   actionButton('clear_filter','Clear'),
   downloadButton('downloadTableData', 'Download'),
   verbatimTextOutput('filter_nrow'),
-  verbatimTextOutput('criteria')
+  verbatimTextOutput('criteria'),
+  actionButton('clean_cache','Clean Cache')
 )->filtering
 
 collapsibleDiv(
