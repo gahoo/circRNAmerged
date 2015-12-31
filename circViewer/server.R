@@ -326,10 +326,20 @@ shinyServer(function(input, output, session) {
       colors_scheme = 'Blues'
     }
     
+    if(input$pheatmap_cluster_cols & input$pheatmap_cluster_rows){
+      dendrogram = 'both'
+    }else if(input$pheatmap_cluster_cols & !input$pheatmap_cluster_rows){
+      dendrogram = 'column'
+    }else if(!input$pheatmap_cluster_cols & input$pheatmap_cluster_rows){
+      dendrogram = 'row'
+    }else{
+      dendrogram = 'none'
+    }
+    
     ciri_selected() %>%
       prepareHeatmapRatio(diff=input$diff_ratio, color_fix=T, rownames_fix=T) %>%
       d3heatmap(colors = colors_scheme,
-                dendrogram = input$d3heatmap_dendrogram,
+                dendrogram = dendrogram,
                 scale = input$d3heatmap_scale,
                 symm = input$d3heatmap_symm,
                 xaxis_height=150, yaxis_width=350)
@@ -634,7 +644,9 @@ output$downloadFa <- downloadHandler(
       selectizeInput('exp_heatmap_anno_column', 'Annotation column', multiple = T,
                      choices = exp_columns, selected = 'gene_id'),
       selectizeInput('exp_heatmap_exclude_columns', 'Exclude columns', multiple = T,
-                     choices = exp_columns, selected = 'gene_id')
+                     choices = exp_columns, selected = 'gene_id'),
+      selectInput('exp_heatmap_log', 'Expression log function',
+                  choices = c('log10', 'log2', 'doNothing'), selected = 'doNothing')
       )
   })
 
@@ -644,7 +656,8 @@ output$downloadFa <- downloadHandler(
     exp_filter() %>%
       prepareHeatmap(
         anno_column = input$exp_heatmap_anno_column,
-        exclude_columns = input$exp_heatmap_exclude_columns) %>%
+        exclude_columns = input$exp_heatmap_exclude_columns,
+        logFunc = input$exp_heatmap_log) %>%
       plotRelExpPheatmap(
         color = colors_scheme,
         scale = input$d3heatmap_scale,

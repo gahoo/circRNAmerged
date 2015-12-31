@@ -231,7 +231,7 @@ collapsibleDiv(id='selected_rows_ratio_pattern', collapse = T,
   ratio_pattern
 
 collapsibleDiv(id='selected_rows_heatmap', collapse = T,
-               label = 'ratioHeatmap',
+               label = 'Heatmaps',
                class = 'btn-info btn-xs',
                fixedCollaspablePanel(
                  id='heatmap_controls', collapse = F,
@@ -240,9 +240,6 @@ collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                  icon = icon('info-sign',lib='glyphicon'),
                  checkboxInput('diff_ratio', 'Diff Ratio', value = F),
                  checkboxInput('d3heatmap_symm', 'symm', value = F),
-                 selectInput('d3heatmap_dendrogram', 'dendrogram',
-                             choices=c('none', 'row', 'column', 'both'),
-                             selected='both'),
                  selectInput('d3heatmap_scale', 'scale',
                              choices=c('none', 'row', 'column'),
                              selected='none'),
