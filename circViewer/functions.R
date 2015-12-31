@@ -386,12 +386,22 @@ plotRepeat<-function(repeatGranges, repeat.y, repeat.fill = 'strand'){
   }
 }
 
-plotMutation<-function(mutation, mutation.y='circRNA_ID',
+prepareMutation<-function(df, mutation, extend_ranges, flank_only, extend_size){
+  mutation$width<-NULL
+  mutationRanges <- makeGRangesFromDataFrame(mutation, keep.extra.columns=T)
+  
+  df %>%
+    df2extendRanges(
+      extend_ranges = extend_ranges,
+      flank_only = flank_only,
+      extend_size = extend_size) %>%
+    overlapDfMutations(mutationRanges)
+}
+
+plotMutation<-function(mutation.gr, mutation.y='circRNA_ID',
                        mutation.fill='strand',
                        mutation.color=mutation.fill){
-  if(nrow(mutation)!=0){
-    mutation$width<-NULL
-    mutation.gr <- makeGRangesFromDataFrame(mutation, keep.extra.columns=T)
+  if(length(mutation.gr)!=0){
     ggbio() + 
       geom_rect(
         data = mutation.gr,
@@ -487,7 +497,15 @@ plotTrack<-function(df, plot.arc=T, plot.transcript=T, plot.repeats=T, plot.muta
   }
   
   if(plot.mutation){
-    mutation<-plotMutation(mutation, mutation.y, mutation.fill)
+    other_args<-list(...)
+    df %>%
+    prepareMutation(
+      mutation = mutation,
+      extend_ranges = other_args$mutation_extend_ranges,
+      flank_only = other_args$mutation_flank_only,
+      extend_size = other_args$mutation_extend_size) %>%
+      plotMutation(mutation.y, mutation.fill) ->
+    mutation
   }else{
     mutation <- NULL
   }
@@ -866,6 +884,14 @@ overlapMutations<-function(dfRanges, mutationRanges){
         mutationRanges[subjectHits(hits)] %>% as.data.frame
         ) %>%
     unique
+}
+
+overlapDfMutations<-function(dfRanges, mutationRanges){
+  findOverlaps(dfRanges, mutationRanges) %>%
+    subjectHits %>%
+    unique ->
+    idx
+  mutationRanges[idx]
 }
 
 overlapBedDf<-function(df, bedRanges){

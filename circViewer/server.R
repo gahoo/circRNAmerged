@@ -387,6 +387,9 @@ ciri_merged_filter<-reactive({
         plot.transcript = input$track_transcript,
         plot.repeats = input$track_repeats,
         plot.mutation = input$track_mutation,
+        mutation_extend_ranges = input$mutation_extend,
+        mutation_flank_only = input$mutation_flank_only,
+        mutation_extend_size = input$mutation_extend_size,
         extend_size = input$track_extend_size,
         flank_only = input$track_repeats_flank_only,
         repeat_column = input$track_repeats_column,
@@ -469,7 +472,14 @@ ciri_merged_filter<-reactive({
           flank_only = input$track_repeats_flank_only,
           repeat_column = input$track_repeats_column,
           repeat.y = input$track_repeats_y,
-          repeat.fill = input$track_repeats_fill)
+          repeat.fill = input$track_repeats_fill,
+          mutation = mutation_filter(),
+          mutation.y = input$track_mutation_y,
+          mutation.fill = input$track_mutation_fill,
+          mutation_extend_ranges = input$mutation_extend,
+          mutation_flank_only = input$mutation_flank_only,
+          mutation_extend_size = input$mutation_extend_size
+          )
       )
       
       dfPrepareFunc = list(
