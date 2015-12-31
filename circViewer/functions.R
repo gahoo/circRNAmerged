@@ -319,17 +319,20 @@ fixGene<-function(df){
     )
 }
 
-df2extendRanges<- function(df, flank_only, extend_size){
-  if(flank_only){
-    change_range<-flank_both
+df2extendRanges<- function(df, extend_ranges, flank_only, extend_size){
+  if(extend_ranges){
+    if(flank_only){
+      change_range<-flank_both
+    }else{
+      change_range<-extend
+    }
   }else{
-    change_range<-extend
+    change_range<-doNothing
   }
   
   df %>%
     df2GRanges %>%
-    change_range(extend_size)->
-    which
+    change_range(extend_size)
 }
 
 prepareRepeat<-function(df, extend_size=0, flank_only=F,
@@ -353,7 +356,9 @@ prepareRepeat<-function(df, extend_size=0, flank_only=F,
     repeats[rev_comp_idx]
   }
   
-  which <- df2extendRanges(df, flank_only, extend_size)
+  which <- df2extendRanges(
+    df, extend_ranges=T, flank_only=flank_only,
+    extend_size=extend_size)
   repeats <- subsetByOverlaps(rmsk, which, ignore.strand=T)
   mcols(repeats) %>%
     as.data.frame %>%
