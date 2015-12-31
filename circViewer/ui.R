@@ -99,12 +99,17 @@ collapsibleDiv(
 collapsibleDiv(
   id='overlaping', collapse = T,
   label = 'overlaping',
-  class = 'btn-warning btn-xs pull-right',
+  class = 'btn-danger btn-xs pull-right',
   style='background: rgba(255, 255, 255, 0.9);',
   icon = icon('info-sign',lib='glyphicon'),
   checkboxInput('overlaping', 'filtered by overlaping bed file', value = F),
   checkboxInput('anno_bed', 'annotate with bed file', value = F),
-  textInput('overlaping_bed_file', 'Bed file', value='extra/snv.indel.csv.S3.bed')
+  textInput('mutation_file', 'Mutation file(bed or RData)', value='extra/snv.indel.csv.S3.bed'),
+  textInput('mutation_obj_name', 'RData object name', value='mutation'),
+  checkboxInput('mutation_extend', 'extend circRNA flanking', value=F),
+  checkboxInput('mutation_flank_only', 'flank only', value=F),
+  numericInput('mutation_extend_size', 'extend size for mutation:',
+               value = '2000', min = 0, max = 100000)
 ) -> overlapping
 
 collapsibleDiv(id='ciri_table', collapse = F,
@@ -166,18 +171,6 @@ collapsibleDiv(id='selected_mutation_table', collapse = T,
                label = 'Mutation',
                style='background: #FFFFFF;',
                class = 'btn-primary btn-xs',
-               fixedCollaspablePanel(
-                 id='mutation_files', collapse = F,
-                 label = 'mutation',
-                 class = 'btn-success btn-xs pull-right',
-                 icon = icon('info-sign',lib='glyphicon'),
-                 textInput('mutation_file', 'Mutation file', value='extra/snv.indel.csv.S3.bed'),
-                 textInput('mutation_obj_name', 'RData object name', value='mutation'),
-                 checkboxInput('mutation_extend', 'extend circRNA flanking', value=F),
-                 checkboxInput('mutation_flank_only', 'flank only', value=F),
-                 numericInput('mutation_extend_size', 'extend size for repeat:',
-                              value = '2000', min = 0, max = 100000)
-               ),
                DT::dataTableOutput('rows_mutation_table', width='800px')
 ) ->
   mutation_table
@@ -273,6 +266,7 @@ collapsibleDiv(id='selected_rows_arc', collapse = T,
                  icon = icon('info-sign',lib='glyphicon'),
                  checkboxInput('track_arc', 'plot arc', value=T),
                  checkboxInput('track_transcript', 'plot transcript', value=F),
+                 hr(),
                  checkboxInput('track_repeats', 'plot repeats', value=F),
                  checkboxInput('track_repeats_flank_only', 'flank only', value=F),
                  numericInput('track_extend_size', 'extend size for repeat:',
@@ -286,6 +280,7 @@ collapsibleDiv(id='selected_rows_arc', collapse = T,
                  selectInput('track_repeats_fill', 'repeat fill color by', 
                              choices = c('name', 'score', 'class', 'family', 'strand'),
                              selected = 'strand'),
+                 hr(),
                  checkboxInput('track_mutation', 'plot mutation', value=F),
                  uiOutput('track_mutation_ui')
                ),

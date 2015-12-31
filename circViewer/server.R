@@ -92,8 +92,11 @@ shinyServer(function(input, output, session) {
     
     if(input$anno_bed){
       ciri_rbind() %>%
-        df2GRanges %>%
-        annotateBed(bed())
+        df2extendRanges(
+          extend_ranges = input$mutation_extend,
+          flank_only = input$mutation_flank_only,
+          extend_size = input$mutation_extend_size) %>%
+        annotateBed(mutation())
     }else{
       data.frame(circRNA_ID=factor())
     }
@@ -106,12 +109,22 @@ shinyServer(function(input, output, session) {
                  detail = 'This may take a while...')
     
     ciri_files<-dir(input$ciri_path)
+    if(input$anno_bed){
+      mutate<-list(input$anno_bed,
+                   input$mutation_extend,
+                   input$mutation_flank_only,
+                   input$mutation_extend_size)
+    }else{
+      mutate<-input$anno_bed
+    }
     md5<-list(ciri_files,
               input$load_nrow,
               input$extend_size,
               input$anno_repeat,
               input$anno_bed,
-              input$overlaping_bed_file) %>% 
+              input$overlaping_bed_file,
+              mutate
+              ) %>% 
       digest
     rdfile<-paste0('rdfiles/',md5,'.RData')
     message(rdfile)
@@ -131,23 +144,15 @@ shinyServer(function(input, output, session) {
     ciri_merged_df
   })
   
-  bed<-reactive({
-    progress <- shiny::Progress$new(session)
-    on.exit(progress$close())
-    progress$set(message = 'Loading Bed',
-                 detail = 'This may take a while...')
-    
-    loadExtraData(input$overlaping_bed_file)
-  })
   
-  ciri_merged_filter<-reactive({
+ciri_merged_filter<-reactive({
     progress <- shiny::Progress$new(session)
     on.exit(progress$close())
     progress$set(message = 'Filtering table',
                  detail = 'This may take a while...')
     
     if(input$overlaping){
-      overlaping<-function(x){overlapBedDf(x, bedRanges=bed())}
+      overlaping<-function(x){overlapBedDf(x, bedRanges=mutation())}
     }else{
       overlaping<-doNothing
     }
@@ -681,18 +686,11 @@ output$downloadFa <- downloadHandler(
   })
   
   mutation_filter<-reactive({
-    if(input$mutation_extend){
-      makeRanges<-function(x){
-        df2extendRanges(x, 
-          flank_only = input$mutation_flank_only,
-          extend_size = input$mutation_extend_size)
-      }
-    }else{
-      makeRanges<-df2GRanges
-    }
-    
     ciri_selected() %>%
-      makeRanges %>%
+      df2extendRanges(
+        extend_ranges = input$mutation_extend,
+        flank_only = input$mutation_flank_only,
+        extend_size = input$mutation_extend_size) %>%
       overlapMutations(mutation())
   })
   
