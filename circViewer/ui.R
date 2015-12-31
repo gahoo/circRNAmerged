@@ -86,7 +86,7 @@ collapsibleDiv(
   style='background: rgba(255, 255, 255, 0.9);',
   icon = icon('info-sign',lib='glyphicon'),
   selectInput('subsettingBy', 'subsetting by:',
-              choices = c('rows', 'pages', 'none'),
+              choices = c('rows', 'last_clicked', 'pages', 'none'),
               selected = 'rows'),
   selectInput('showBy', 'show by:',
               choices = c('circRNA_ID', 'symbol'),

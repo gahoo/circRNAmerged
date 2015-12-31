@@ -192,9 +192,15 @@ ciri_merged_filter<-reactive({
       func<-doNothing
     }
     
+    if(input$subsettingBy=='last_clicked'){
+      selection='single'
+    }else{
+      selection='multiple'
+    }
+    
     ciri_merged_filter() %>%
       func %>%
-      datatable_template
+      datatable_template(selection=selection)
   })
   
 #   proxy = DT::dataTableProxy('ciri_datatable')
@@ -253,6 +259,8 @@ ciri_merged_filter<-reactive({
     
     if(input$subsettingBy=='rows'){
       row_id<-input$ciri_datatable_rows_selected
+    }else if(input$subsettingBy=='last_clicked'){
+      row_id<-input$ciri_datatable_row_last_clicked
     }else if(input$subsettingBy=='pages'){
       row_id<-input$ciri_datatable_rows_current
     }
