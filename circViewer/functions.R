@@ -462,6 +462,7 @@ plotTrack<-function(df, plot.arc=T, plot.transcript=T, plot.repeats=T, plot.muta
   }
   
   df <- df %>% filter(!is.na(chr))
+  other_args<-list(...)
   error <- checkError(df)
   if(!is.null(error)){
     return(error)
@@ -477,7 +478,12 @@ plotTrack<-function(df, plot.arc=T, plot.transcript=T, plot.repeats=T, plot.muta
   
   if(plot.repeats){
     df %>%
-      prepareRepeat(...) %>%
+      prepareRepeat(
+        extend_size=other_args$extend_size,
+        flank_only=other_args$flank_only,
+        repeat_column=other_args$repeat_column,
+        reverse_complement_only=T
+        ) %>%
       plotRepeat(repeat.y=repeat.y,
                  repeat.fill) ->
       repeats
@@ -497,7 +503,6 @@ plotTrack<-function(df, plot.arc=T, plot.transcript=T, plot.repeats=T, plot.muta
   }
   
   if(plot.mutation){
-    other_args<-list(...)
     df %>%
     prepareMutation(
       mutation = mutation,
