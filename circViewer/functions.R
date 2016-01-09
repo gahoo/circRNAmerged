@@ -292,12 +292,12 @@ plotArc<-function(arc, facet='sample ~ .', ...){
   }else{
     args<-list(...)
     names(args)<-gsub('arc.','',names(args))
-    #mapping<-aes_string(fill = "type", color = "type", height = "relExp", size = "-log10P")
+    facet<-ifelse(facet=="",'NULL',facet)
     mapping<-do.call(aes_string, args)
+    
     ggbio() +
       geom_arch(
         data=arc,
-        #ylab='Relative Expression Ratio',
         ylab=args$height,
         mapping,
         alpha = 0.4,
