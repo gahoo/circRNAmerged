@@ -485,6 +485,7 @@ ciri_merged_filter<-reactive({
           alpha=input$tbl_plot_alpha,
           group=input$tbl_plot_group,
           size=input$tbl_plot_size,
+          shape=input$tbl_plot_shape,
           facet=input$tbl_plot_facet),
         plotRelExpPheatmap=list(
           color = colors_scheme,
@@ -558,7 +559,9 @@ ciri_merged_filter<-reactive({
   
   output$tbl_plot_ctrls<-renderUI({
     choices <- names(ciri_merged_filter())
+    factor_idx <- sapply(ciri_merged_filter(), class) %in% c("character", "factor")
     additionnal.choices<-c('NULL', choices)
+    additionnal.choices.factor<-c('NULL', choices[factor_idx])
     exclude.columns<-setdiff(additionnal.choices, c())
       
     list(
@@ -584,7 +587,9 @@ ciri_merged_filter<-reactive({
         selectInput('tbl_plot_group', 'group', 
                     choices = additionnal.choices, selected='NULL'),
         selectInput('tbl_plot_size', 'size',
-                    choices = additionnal.choices, selected='NULL')
+                    choices = additionnal.choices, selected='NULL'),
+        selectInput('tbl_plot_shape', 'shape',
+                    choices = additionnal.choices.factor, selected='NULL')
         )
     )
   })
@@ -603,6 +608,7 @@ ciri_merged_filter<-reactive({
         alpha=input$tbl_plot_alpha,
         group=input$tbl_plot_group,
         size=input$tbl_plot_size,
+        shape=input$tbl_plot_shape,
         facet=input$tbl_plot_facet)
   })
 
