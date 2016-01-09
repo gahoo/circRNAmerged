@@ -257,6 +257,9 @@ collapsibleDiv(id='selected_rows_heatmap', collapse = T,
                )
 )->ratio_heatmap
 
+
+arc_columns<-c('seqnames', 'ranges', 'strand', 'circRNA_ID', 'circRNA_type', 'p.values',
+               'sample', 'junction', 'non_junction', 'relExp', 'type', '-log10P')
 collapsibleDiv(id='selected_rows_arc', collapse = T,
                label = 'arcPlot',
                class = 'btn-info btn-xs',
@@ -265,25 +268,39 @@ collapsibleDiv(id='selected_rows_arc', collapse = T,
                  label = 'arcControls',
                  class = 'btn-success btn-xs pull-right',
                  icon = icon('info-sign',lib='glyphicon'),
+                 style='background: rgba(255, 255, 255, 0.9);',
                  checkboxInput('track_arc', 'plot arc', value=T),
                  checkboxInput('track_transcript', 'plot transcript', value=F),
-                 hr(),
                  checkboxInput('track_repeats', 'plot repeats', value=F),
-                 checkboxInput('track_repeats_flank_only', 'flank only', value=F),
-                 numericInput('track_extend_size', 'extend size for repeat:',
-                              value = '2000', min = 0, max = 100000),
-                 selectInput('track_repeats_y', 'repeat.y', 
-                             choices = c('name', 'class', 'family'),
-                             selected = 'name'),
-                 selectInput('track_repeats_column', 'repeat reverse complement by', 
-                             choices = c('name', 'class', 'family'),
-                             selected = 'name'),
-                 selectInput('track_repeats_fill', 'repeat fill color by', 
-                             choices = c('name', 'score', 'class', 'family', 'strand'),
-                             selected = 'strand'),
-                 hr(),
                  checkboxInput('track_mutation', 'plot mutation', value=F),
-                 uiOutput('track_mutation_ui')
+                 tabsetPanel(
+                   tabPanel('arc',
+                     selectInput('track_arc_color', 'color', choices = arc_columns,
+                                 selected = 'type'),
+                     selectInput('track_arc_height', 'height', choices = arc_columns,
+                                 selected = 'relExp'),
+                     selectInput('track_arc_size', 'size', choices = arc_columns,
+                                 selected = '-log10P'),
+                     textInput('track_arc_facet', 'arc facet', value = 'sample ~ .')
+                     ),
+                   tabPanel('repeat',
+                     checkboxInput('track_repeats_flank_only', 'flank only', value=F),
+                     numericInput('track_extend_size', 'extend size for repeat:',
+                                  value = '2000', min = 0, max = 100000),
+                     selectInput('track_repeats_y', 'repeat.y', 
+                                 choices = c('name', 'class', 'family'),
+                                 selected = 'name'),
+                     selectInput('track_repeats_column', 'repeat reverse complement by', 
+                                 choices = c('name', 'class', 'family'),
+                                 selected = 'name'),
+                     selectInput('track_repeats_fill', 'repeat fill color by', 
+                                 choices = c('name', 'score', 'class', 'family', 'strand'),
+                                 selected = 'strand')
+                   ),
+                   tabPanel('mutation',
+                     uiOutput('track_mutation_ui')
+                     )
+                   )
                ),
                plotOutput('arc_plot')
 )->

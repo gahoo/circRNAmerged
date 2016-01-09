@@ -425,7 +425,12 @@ ciri_merged_filter<-reactive({
         repeat.fill = input$track_repeats_fill,
         mutation = mutation_filter(),
         mutation.y = input$track_mutation_y,
-        mutation.fill = input$track_mutation_fill
+        mutation.fill = input$track_mutation_fill,
+        arc.fill = input$track_arc_fill,
+        arc.color = input$track_arc_color,
+        arc.height = input$track_arc_height,
+        arc.size = input$track_arc_size,
+        arc.facet = input$track_arc_facet
         )
   })
 
@@ -507,7 +512,12 @@ ciri_merged_filter<-reactive({
           mutation.fill = input$track_mutation_fill,
           mutation_extend_ranges = input$mutation_extend,
           mutation_flank_only = input$mutation_flank_only,
-          mutation_extend_size = input$mutation_extend_size
+          mutation_extend_size = input$mutation_extend_size,
+          arc.fill = input$track_arc_fill,
+          arc.color = input$track_arc_color,
+          arc.height = input$track_arc_height,
+          arc.size = input$track_arc_size,
+          arc.facet = input$track_arc_facet
           )
       )
       

@@ -285,18 +285,23 @@ prepareArc<-function(df){
     makeGRangesFromDataFrame(keep.extra.columns=T)
 }
 
-plotArc<-function(arc){
+plotArc<-function(arc, facet='sample ~ .', ...){
   if(length(arc)==0){
     message("empty")
     NULL
   }else{
+    args<-list(...)
+    names(args)<-gsub('arc.','',names(args))
+    #mapping<-aes_string(fill = "type", color = "type", height = "relExp", size = "-log10P")
+    mapping<-do.call(aes_string, args)
     ggbio() +
       geom_arch(
         data=arc,
-        ylab='Relative Expression Ratio',
-        aes(fill = type, color = type, height = relExp, size = -log10P),
+        #ylab='Relative Expression Ratio',
+        ylab=args$height,
+        mapping,
         alpha = 0.4,
-        facets = sample ~ .) +
+        facets = as.formula(facet)) +
       scale_size(range = c(0, 6))
   }
 }
@@ -471,7 +476,14 @@ plotTrack<-function(df, plot.arc=T, plot.transcript=T, plot.repeats=T, plot.muta
   symbol <- getSymbol(df)
   
   if(plot.arc){
-    arc <- df %>% prepareArc %>% plotArc
+    arc <- df %>%
+      prepareArc %>% 
+      plotArc(
+        facet = other_args$arc.facet,
+        fill = other_args$arc.fill,
+        color = other_args$arc.color,
+        height = other_args$arc.height, 
+        size = other_args$arc.size)
   }else{
     arc <- NULL
   }
