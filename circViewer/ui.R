@@ -259,7 +259,7 @@ collapsibleDiv(id='selected_rows_heatmap', collapse = T,
 
 
 arc_columns<-c('seqnames', 'ranges', 'strand', 'circRNA_ID', 'circRNA_type', 'p.values',
-               'sample', 'junction', 'non_junction', 'relExp', 'type', '-log10P')
+               'sample', 'junction', 'non_junction', 'relExp', 'type', '-log10P', 'NULL')
 collapsibleDiv(id='selected_rows_arc', collapse = T,
                label = 'arcPlot',
                class = 'btn-info btn-xs',
