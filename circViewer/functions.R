@@ -899,8 +899,8 @@ overlapDfMutations<-function(dfRanges, mutationRanges){
   mutationRanges[idx]
 }
 
-overlapBedDf<-function(df, bedRanges){
-  dfRanges <- df2GRanges(df)
+overlapBedDf<-function(df, bedRanges, ...){
+  dfRanges <- df2extendRanges(df, ...)
   hits<-findOverlaps(dfRanges, bedRanges)
   ids<-mcols(dfRanges[queryHits(hits) %>% unique])$circRNA_ID
   df %>%

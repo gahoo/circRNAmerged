@@ -152,7 +152,13 @@ ciri_merged_filter<-reactive({
                  detail = 'This may take a while...')
     
     if(input$overlaping){
-      overlaping<-function(x){overlapBedDf(x, bedRanges=mutation())}
+      overlaping<-function(x){
+          overlapBedDf(x,
+            bedRanges=mutation(),
+            extend_ranges = input$mutation_extend,
+            flank_only = input$mutation_flank_only,
+            extend_size = input$mutation_extend_size)
+      }
     }else{
       overlaping<-doNothing
     }
